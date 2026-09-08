@@ -4,13 +4,71 @@ import { EmailTemplateEditorClient } from "./EmailTemplateEditorClient";
 
 export const metadata = { title: "Email Templates — Admin" };
 
+// Customer-facing templates — Arabic only, matching the hard-coded senders in
+// src/lib/email.ts. `name` stays English because it is an admin-panel label.
+// Bodies are RTL: the email shell (emailWrapper) is already dir="rtl".
 const DEFAULT_TEMPLATES = [
-  { key: "order_confirmed", name: "Order Confirmed", subject: "Your order {{orderNumber}} is confirmed!", body: "<p>Hi {{firstName}},</p><p>Thank you for your order <strong>{{orderNumber}}</strong>. We've received it and it's being processed.</p><p>Total: <strong>{{total}} {{currency}}</strong></p><p>We'll notify you when it ships.</p><p>فريق دار الكرمة</p>" },
-  { key: "order_shipped", name: "Order Shipped", subject: "Your order {{orderNumber}} is on its way!", body: "<p>Hi {{firstName}},</p><p>Great news! Your order <strong>{{orderNumber}}</strong> has been shipped.</p>{{#if trackingNumber}}<p>Tracking: <strong>{{trackingNumber}}</strong> via {{carrierName}}</p>{{/if}}<p>فريق دار الكرمة</p>" },
-  { key: "order_delivered", name: "Order Delivered", subject: "Your order has been delivered!", body: "<p>Hi {{firstName}},</p><p>Your order <strong>{{orderNumber}}</strong> has been delivered. Enjoy your books!</p><p>Please leave a review if you liked your purchase.</p><p>فريق دار الكرمة</p>" },
-  { key: "welcome", name: "Welcome Email", subject: "أهلًا بك في دار الكرمة!", body: "<p>Hi {{firstName}},</p><p>أهلًا بك في دار الكرمة! We're excited to have you.</p><p>Browse our collection at <a href='https://alkarmabooks.com'>alkarmabooks.com</a></p><p>فريق دار الكرمة</p>" },
-  { key: "abandoned_cart", name: "Abandoned Cart Recovery", subject: "You left something behind…", body: "<p>Hi {{firstName}},</p><p>You left <strong>{{itemCount}} item(s)</strong> in your cart. Come back and complete your order!</p><p><a href='https://alkarmabooks.com/cart'>Return to Cart →</a></p><p>فريق دار الكرمة</p>" },
-  { key: "password_reset", name: "Password Reset", subject: "إعادة تعيين كلمة مرور حسابك في دار الكرمة", body: "<p>Hi {{firstName}},</p><p>Click the link below to reset your password. This link expires in 1 hour.</p><p><a href='{{resetLink}}'>Reset Password →</a></p><p>If you didn't request this, ignore this email.</p>" },
+  {
+    key: "order_confirmed",
+    name: "Order Confirmed",
+    subject: "تم تأكيد طلبك {{orderNumber}}",
+    body:
+      "<p>أهلًا {{firstName}}،</p>" +
+      "<p>شكرًا لطلبك <strong>{{orderNumber}}</strong>. استلمنا الطلب وجارٍ تجهيزه.</p>" +
+      "<p>الإجمالي: <strong>{{total}} {{currency}}</strong></p>" +
+      "<p>سنُعلمك فور شحن الطلب.</p>" +
+      "<p>فريق دار الكرمة</p>",
+  },
+  {
+    key: "order_shipped",
+    name: "Order Shipped",
+    subject: "طلبك {{orderNumber}} في الطريق إليك!",
+    body:
+      "<p>أهلًا {{firstName}}،</p>" +
+      "<p>خبر سار! تم شحن طلبك <strong>{{orderNumber}}</strong>.</p>" +
+      "{{#if trackingNumber}}<p>رقم التتبع: <strong>{{trackingNumber}}</strong> عبر {{carrierName}}</p>{{/if}}" +
+      "<p>فريق دار الكرمة</p>",
+  },
+  {
+    key: "order_delivered",
+    name: "Order Delivered",
+    subject: "تم تسليم طلبك!",
+    body:
+      "<p>أهلًا {{firstName}}،</p>" +
+      "<p>تم تسليم طلبك <strong>{{orderNumber}}</strong>. قراءة ممتعة!</p>" +
+      "<p>يسعدنا أن تشاركنا رأيك بتقييم الكتاب إذا أعجبك.</p>" +
+      "<p>فريق دار الكرمة</p>",
+  },
+  {
+    key: "welcome",
+    name: "Welcome Email",
+    subject: "أهلًا بك في دار الكرمة!",
+    body:
+      "<p>أهلًا {{firstName}}،</p>" +
+      "<p>أهلًا بك في دار الكرمة! سعداء بانضمامك إلينا.</p>" +
+      "<p>تصفّح مكتبتنا على <a href='https://alkarmabooks.com'>alkarmabooks.com</a></p>" +
+      "<p>فريق دار الكرمة</p>",
+  },
+  {
+    key: "abandoned_cart",
+    name: "Abandoned Cart Recovery",
+    subject: "نسيت شيئًا في سلتك…",
+    body:
+      "<p>أهلًا {{firstName}}،</p>" +
+      "<p>تركت <strong>{{itemCount}}</strong> منتج في سلة التسوق. أكمل طلبك قبل نفاد الكمية!</p>" +
+      "<p><a href='https://alkarmabooks.com/cart'>العودة إلى السلة ←</a></p>" +
+      "<p>فريق دار الكرمة</p>",
+  },
+  {
+    key: "password_reset",
+    name: "Password Reset",
+    subject: "إعادة تعيين كلمة مرور حسابك في دار الكرمة",
+    body:
+      "<p>أهلًا {{firstName}}،</p>" +
+      "<p>اضغط على الرابط بالأسفل لإعادة تعيين كلمة المرور. تنتهي صلاحية الرابط خلال ساعة واحدة.</p>" +
+      "<p><a href='{{resetLink}}'>إعادة تعيين كلمة المرور ←</a></p>" +
+      "<p>إذا لم تطلب ذلك، يمكنك تجاهل هذه الرسالة.</p>",
+  },
 ];
 
 async function saveTemplate(formData: FormData) {

@@ -696,6 +696,11 @@ model Redirect {
   fromPath   String   @unique
   toPath     String
   statusCode Int      @default(301)
+  /// When true, fromPath is a path PREFIX and everything after it is carried
+  /// over: "/product" -> "/book" turns /product/foo into /book/foo. This is
+  /// what makes the WordPress -> Next.js migration tractable — the previous
+  /// site has ~1,000 /product/<slug> URLs that would otherwise each need a row.
+  isPrefix   Boolean  @default(false)
   hits       Int      @default(0)
   createdAt  DateTime @default(now())
 

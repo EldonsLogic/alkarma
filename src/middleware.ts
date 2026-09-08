@@ -11,7 +11,8 @@ import { COUNTRY_COOKIE } from "@/lib/shipping-region";
 // DB round trip PER PAGE VIEW, scaling directly with traffic — exactly what
 // you don't want right before real ad-driven visitors arrive. Caching this
 // for 5 minutes cuts it to roughly one query per 5 minutes, platform-wide.
-let redirectsCache: { data: { from: string; to: string; statusCode: number }[]; expires: number } | null = null;
+type RedirectRule = { from: string; to: string; statusCode: number; isPrefix: boolean };
+let redirectsCache: { data: RedirectRule[]; expires: number } | null = null;
 const REDIRECTS_TTL_MS = 5 * 60 * 1000;
 
 async function getCachedRedirects(origin: string) {
@@ -21,7 +22,7 @@ async function getCachedRedirects(origin: string) {
     const res = await fetch(`${origin}/api/redirects`);
     const data = res.ok ? await res.json() : [];
     redirectsCache = { data, expires: now + REDIRECTS_TTL_MS };
-    return data as { from: string; to: string; statusCode: number }[];
+    return data as RedirectRule[];
   } catch {
     // On failure, keep serving the previous (possibly stale) cache rather
     // than hammering the DB on every request; fall back to empty if none yet.
@@ -36,10 +37,39 @@ export async function middleware(request: NextRequest) {
   const isStorefront = !pathname.startsWith("/admin") && !pathname.startsWith("/_next");
   if (isStorefront) {
     const redirects = await getCachedRedirects(request.nextUrl.origin);
-    const match = redirects.find((r) => r.from === pathname);
+
+    // The previous site is WordPress and used trailing slashes, so /product/foo/
+    // and /product/foo must both resolve.
+    const raw = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+
+    // Most of the old category/page slugs are Arabic and travel percent-encoded.
+    // Rules are stored decoded, so compare against both forms.
+    let clean = raw;
+    try {
+      clean = decodeURIComponent(raw);
+    } catch {
+      // Malformed escape sequence — fall back to the raw path.
+    }
+
+    // Exact rules win over prefix rules; among prefixes the LONGEST wins, so a
+    // specific "/book-category/fiction" beats a general "/book-category".
+    const exact = redirects.find(
+      (r) => !r.isPrefix && (r.from === clean || r.from === raw)
+    );
+    const prefix = exact
+      ? null
+      : redirects
+          .filter((r) => r.isPrefix && (clean === r.from || clean.startsWith(r.from + "/")))
+          .sort((a, b) => b.from.length - a.from.length)[0];
+
+    const match = exact ?? prefix;
     if (match) {
       const url = request.nextUrl.clone();
-      url.pathname = match.to;
+      // For a prefix rule the tail is carried over from the DECODED path, so
+      // /product/<arabic-slug> keeps its slug intact on the way to /book/…
+      url.pathname = match.isPrefix
+        ? match.to + clean.slice(match.from.length)
+        : match.to;
       return NextResponse.redirect(url, { status: match.statusCode === 302 ? 302 : 301 });
     }
   }

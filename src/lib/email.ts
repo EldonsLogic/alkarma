@@ -79,15 +79,15 @@ export async function sendShippingNotification(
   await transporter.sendMail({
     from: FROM,
     to,
-    subject: `Your order has shipped — ${orderNumber} | دار الكرمة`,
+    subject: `تم شحن طلبك — ${orderNumber} | ${BRAND_AR}`,
     html: emailWrapper(`
-      <h2 style="margin:0 0 16px;color:#000000">Your order is on its way! 🚀</h2>
-      <p style="margin:0 0 8px;color:#696969">Order <strong>${orderNumber}</strong> has been dispatched.</p>
-      <p style="margin:0 0 4px;color:#696969"><strong>Carrier:</strong> ${carrier}</p>
-      <p style="margin:0 0 24px;color:#696969"><strong>Tracking number:</strong> ${trackingNumber}</p>
-      <a href="${SITE}/account/orders" style="display:inline-block;background:#cd201f;color:#fff;padding:12px 28px;text-decoration:none;font-weight:bold;letter-spacing:0.05em">Track My Order</a>
+      <h2 style="margin:0 0 16px;color:#000000">طلبك في الطريق إليك! 🚀</h2>
+      <p style="margin:0 0 8px;color:#696969">تم شحن طلبك رقم <strong>${orderNumber}</strong>.</p>
+      <p style="margin:0 0 4px;color:#696969"><strong>شركة الشحن:</strong> ${carrier}</p>
+      <p style="margin:0 0 24px;color:#696969"><strong>رقم التتبع:</strong> ${trackingNumber}</p>
+      <a href="${SITE}/account/orders" style="display:inline-block;background:#cd201f;color:#fff;padding:12px 28px;text-decoration:none;font-weight:bold">تتبّع طلبي</a>
     `),
-    text: `Good news! Your order ${orderNumber} has been shipped.\n\nCarrier: ${carrier}\nTracking: ${trackingNumber}\n\n— دار الكرمة`,
+    text: `طلبك في الطريق إليك!\n\nتم شحن الطلب رقم ${orderNumber}.\n\nشركة الشحن: ${carrier}\nرقم التتبع: ${trackingNumber}\n\n— ${BRAND_AR}`,
   });
 }
 
@@ -98,12 +98,12 @@ export async function sendPasswordReset(to: string, resetUrl: string) {
     to,
     subject: "إعادة تعيين كلمة مرور حسابك في دار الكرمة",
     html: emailWrapper(`
-      <h2 style="margin:0 0 16px;color:#000000">Reset your password</h2>
-      <p style="margin:0 0 20px;color:#696969">We received a request to reset the password for your دار الكرمة account. Click the button below — this link expires in 1 hour.</p>
-      <a href="${resetUrl}" style="display:inline-block;background:#cd201f;color:#fff;padding:12px 28px;text-decoration:none;font-weight:bold;letter-spacing:0.05em">Reset Password</a>
-      <p style="margin:24px 0 0;color:#94a3b8;font-size:13px">If you didn't request a password reset, you can safely ignore this email.</p>
+      <h2 style="margin:0 0 16px;color:#000000">إعادة تعيين كلمة المرور</h2>
+      <p style="margin:0 0 20px;color:#696969">وصلنا طلب لإعادة تعيين كلمة مرور حسابك في ${BRAND_AR}. اضغط على الزر بالأسفل — تنتهي صلاحية الرابط خلال ساعة واحدة.</p>
+      <a href="${resetUrl}" style="display:inline-block;background:#cd201f;color:#fff;padding:12px 28px;text-decoration:none;font-weight:bold">إعادة تعيين كلمة المرور</a>
+      <p style="margin:24px 0 0;color:#94a3b8;font-size:13px">إذا لم تطلب إعادة تعيين كلمة المرور، يمكنك تجاهل هذه الرسالة بأمان.</p>
     `),
-    text: `إعادة تعيين كلمة مرور حسابك في دار الكرمة:\n\n${resetUrl}\n\nThis link expires in 1 hour. If you didn't request this, ignore this email.\n\n— دار الكرمة`,
+    text: `إعادة تعيين كلمة مرور حسابك في ${BRAND_AR}:\n\n${resetUrl}\n\nتنتهي صلاحية الرابط خلال ساعة واحدة. إذا لم تطلب ذلك، تجاهل هذه الرسالة.\n\n— ${BRAND_AR}`,
   });
 }
 
@@ -112,13 +112,13 @@ export async function sendWelcomeEmail(to: string, firstName: string) {
   await transporter.sendMail({
     from: FROM,
     to,
-    subject: `أهلًا بك في دار الكرمة, ${firstName}!`,
+    subject: `أهلًا بك في ${BRAND_AR}، ${firstName}!`,
     html: emailWrapper(`
-      <h2 style="margin:0 0 16px;color:#000000">أهلًا بك في دار الكرمة! 📖</h2>
-      <p style="margin:0 0 16px;color:#696969">Hi ${firstName}, your account is all set. Start exploring thousands of titles in English and Arabic — delivered to your door across Egypt.</p>
-      <a href="${SITE}/bestsellers" style="display:inline-block;background:#cd201f;color:#fff;padding:12px 28px;text-decoration:none;font-weight:bold;letter-spacing:0.05em">Browse Bestsellers</a>
+      <h2 style="margin:0 0 16px;color:#000000">أهلًا بك في ${BRAND_AR}! 📖</h2>
+      <p style="margin:0 0 16px;color:#696969">أهلًا ${firstName}، تم إنشاء حسابك بنجاح. تصفّح إصدارات الكرمة وأهم الكتب العربية والمترجمة، مع التوصيل لكل محافظات مصر.</p>
+      <a href="${SITE}/bestsellers" style="display:inline-block;background:#cd201f;color:#fff;padding:12px 28px;text-decoration:none;font-weight:bold">تصفّح الأكثر مبيعًا</a>
     `),
-    text: `أهلًا بك في دار الكرمة, ${firstName}!\n\nYour account is ready. Browse our catalogue at ${SITE}\n\n— دار الكرمة`,
+    text: `أهلًا بك في ${BRAND_AR}، ${firstName}!\n\nتم إنشاء حسابك بنجاح. تصفّح مكتبتنا على ${SITE}\n\n— ${BRAND_AR}`,
   });
 }
 
@@ -153,13 +153,13 @@ export async function sendLowStockAlert(
   await transporter.sendMail({
     from: FROM,
     to,
-    subject: `⚠️ Low stock: ${book.title} (${book.stock} left) | دار الكرمة`,
+    subject: `⚠️ المخزون على وشك النفاد: ${book.title} (${book.stock}) | ${BRAND_AR}`,
     html: emailWrapper(`
-      <h2 style="margin:0 0 16px;color:#000000">Low stock alert ⚠️</h2>
-      <p style="margin:0 0 12px;color:#696969"><strong>${book.title}</strong> is running low — <strong>${book.stock}</strong> ${book.stock === 0 ? "in stock (OUT OF STOCK)" : "left in stock"}.</p>
-      <a href="${SITE}/admin/products" style="display:inline-block;background:#cd201f;color:#fff;padding:12px 28px;text-decoration:none;font-weight:bold;letter-spacing:0.05em">Manage Inventory</a>
+      <h2 style="margin:0 0 16px;color:#000000">تنبيه: المخزون على وشك النفاد ⚠️</h2>
+      <p style="margin:0 0 12px;color:#696969">${book.stock === 0 ? `<strong>${book.title}</strong> — <strong>نفدت الكمية</strong>.` : `تبقّى <strong>${book.stock}</strong> نسخة فقط من <strong>${book.title}</strong>.`}</p>
+      <a href="${SITE}/admin/products" style="display:inline-block;background:#cd201f;color:#fff;padding:12px 28px;text-decoration:none;font-weight:bold">إدارة المخزون</a>
     `),
-    text: `Low stock: ${book.title} — ${book.stock} left.\n${SITE}/admin/products`,
+    text: `تنبيه مخزون: ${book.title} — ${book.stock === 0 ? "نفدت الكمية" : `تبقّى ${book.stock}`}.\n${SITE}/admin/products`,
   });
 }
 
@@ -193,15 +193,15 @@ export async function sendAdminNewReview(r: {
   await transporter.sendMail({
     from: FROM,
     to,
-    subject: `⭐ New review (${r.rating}/5) — ${r.bookTitle}`,
+    subject: `⭐ تقييم جديد (${r.rating}/5) — ${r.bookTitle}`,
     html: emailWrapper(`
-      <h2 style="margin:0 0 12px;color:#000000">New review submitted ⭐</h2>
+      <h2 style="margin:0 0 12px;color:#000000">تقييم جديد ⭐</h2>
       <p style="margin:0 0 6px;color:#696969"><strong>${r.bookTitle}</strong> · ${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</p>
-      <p style="margin:0 0 6px;color:#696969">By: ${r.reviewer}</p>
+      <p style="margin:0 0 6px;color:#696969">بواسطة: ${r.reviewer}</p>
       ${r.comment ? `<p style="margin:0 0 16px;color:#696969;font-style:italic">“${r.comment.slice(0, 300)}”</p>` : ""}
-      <a href="${SITE}/admin/reviews" style="display:inline-block;background:#cd201f;color:#fff;padding:11px 24px;text-decoration:none;font-weight:bold">Moderate reviews</a>
+      <a href="${SITE}/admin/reviews" style="display:inline-block;background:#cd201f;color:#fff;padding:11px 24px;text-decoration:none;font-weight:bold">مراجعة التقييمات</a>
     `),
-    text: `New review (${r.rating}/5) for ${r.bookTitle}\nBy: ${r.reviewer}\n${r.comment}\n${SITE}/admin/reviews`,
+    text: `تقييم جديد (${r.rating}/5) على ${r.bookTitle}\nبواسطة: ${r.reviewer}\n${r.comment}\n${SITE}/admin/reviews`,
   });
 }
 
@@ -221,17 +221,17 @@ export async function sendAdminNewOrder(o: {
   await transporter.sendMail({
     from: FROM,
     to,
-    subject: `🛒 New order ${o.orderNumber} — ${o.total.toFixed(2)} EGP`,
+    subject: `🛒 طلب جديد ${o.orderNumber} — ${o.total.toFixed(2)} EGP`,
     html: emailWrapper(`
-      <h2 style="margin:0 0 12px;color:#000000">New order received 🛒</h2>
-      <p style="margin:0 0 6px;color:#696969"><strong>${o.orderNumber}</strong> · ${o.paymentMethod === "COD" ? "Cash on Delivery" : "Online"}</p>
-      <p style="margin:0 0 16px;color:#696969">Customer: ${o.customerEmail}</p>
+      <h2 style="margin:0 0 12px;color:#000000">وصل طلب جديد 🛒</h2>
+      <p style="margin:0 0 6px;color:#696969"><strong>${o.orderNumber}</strong> · ${o.paymentMethod === "COD" ? "الدفع عند الاستلام" : "دفع أونلاين"}</p>
+      <p style="margin:0 0 16px;color:#696969">العميل: ${o.customerEmail}</p>
       <table width="100%" style="border-collapse:collapse;margin-bottom:16px">${rows}
-        <tr><td style="padding:10px 0;font-weight:bold;color:#000000">Total</td><td style="padding:10px 0;font-weight:bold;text-align:right;color:#cd201f">${o.total.toFixed(2)} EGP</td></tr>
+        <tr><td style="padding:10px 0;font-weight:bold;color:#000000">الإجمالي</td><td style="padding:10px 0;font-weight:bold;text-align:right;color:#cd201f">${o.total.toFixed(2)} EGP</td></tr>
       </table>
-      <a href="${SITE}/admin/orders/${o.orderId}" style="display:inline-block;background:#cd201f;color:#fff;padding:11px 24px;text-decoration:none;font-weight:bold">View in admin</a>
+      <a href="${SITE}/admin/orders/${o.orderId}" style="display:inline-block;background:#cd201f;color:#fff;padding:11px 24px;text-decoration:none;font-weight:bold">عرض في لوحة التحكم</a>
     `),
-    text: `New order ${o.orderNumber} (${o.paymentMethod})\nCustomer: ${o.customerEmail}\n${o.items.map((i) => `• ${i.title} ×${i.quantity}`).join("\n")}\nTotal: ${o.total.toFixed(2)} EGP\n${SITE}/admin/orders/${o.orderId}`,
+    text: `طلب جديد ${o.orderNumber} (${o.paymentMethod})\nالعميل: ${o.customerEmail}\n${o.items.map((i) => `• ${i.title} ×${i.quantity}`).join("\n")}\nالإجمالي: ${o.total.toFixed(2)} EGP\n${SITE}/admin/orders/${o.orderId}`,
   });
 }
 
@@ -246,13 +246,13 @@ export async function sendAdminOrderStatus(o: {
   await transporter.sendMail({
     from: FROM,
     to,
-    subject: `Order ${o.orderNumber} → ${o.status}`,
+    subject: `الطلب ${o.orderNumber} ← ${o.status}`,
     html: emailWrapper(`
-      <h2 style="margin:0 0 12px;color:#000000">Order status updated</h2>
-      <p style="margin:0 0 16px;color:#696969"><strong>${o.orderNumber}</strong>${o.customerName ? ` · ${o.customerName}` : ""} is now <strong style="color:#cd201f">${o.status}</strong>.</p>
-      <a href="${SITE}/admin/orders/${o.orderId}" style="display:inline-block;background:#cd201f;color:#fff;padding:11px 24px;text-decoration:none;font-weight:bold">View in admin</a>
+      <h2 style="margin:0 0 12px;color:#000000">تحديث حالة الطلب</h2>
+      <p style="margin:0 0 16px;color:#696969"><strong>${o.orderNumber}</strong>${o.customerName ? ` · ${o.customerName}` : ""} أصبحت حالته <strong style="color:#cd201f">${o.status}</strong>.</p>
+      <a href="${SITE}/admin/orders/${o.orderId}" style="display:inline-block;background:#cd201f;color:#fff;padding:11px 24px;text-decoration:none;font-weight:bold">عرض في لوحة التحكم</a>
     `),
-    text: `Order ${o.orderNumber} is now ${o.status}.\n${SITE}/admin/orders/${o.orderId}`,
+    text: `الطلب ${o.orderNumber} أصبحت حالته ${o.status}.\n${SITE}/admin/orders/${o.orderId}`,
   });
 }
 
@@ -268,15 +268,15 @@ export async function sendAdminReturnRequest(r: {
   await transporter.sendMail({
     from: FROM,
     to,
-    subject: `↩️ Return requested — ${r.orderNumber}`,
+    subject: `↩️ طلب إرجاع — ${r.orderNumber}`,
     html: emailWrapper(`
-      <h2 style="margin:0 0 12px;color:#000000">Return requested ↩️</h2>
+      <h2 style="margin:0 0 12px;color:#000000">طلب إرجاع ↩️</h2>
       <p style="margin:0 0 6px;color:#696969"><strong>${r.orderNumber}</strong> · ${r.customerEmail}</p>
-      <p style="margin:0 0 12px;color:#696969">Reason: ${r.reason}</p>
-      <p style="margin:0 0 16px;color:#696969">Items: ${r.items.map((i) => `${i.title} ×${i.qty}`).join(", ")}</p>
-      <a href="${SITE}/admin/returns" style="display:inline-block;background:#cd201f;color:#fff;padding:11px 24px;text-decoration:none;font-weight:bold">Review returns</a>
+      <p style="margin:0 0 12px;color:#696969">السبب: ${r.reason}</p>
+      <p style="margin:0 0 16px;color:#696969">المنتجات: ${r.items.map((i) => `${i.title} ×${i.qty}`).join("، ")}</p>
+      <a href="${SITE}/admin/returns" style="display:inline-block;background:#cd201f;color:#fff;padding:11px 24px;text-decoration:none;font-weight:bold">مراجعة طلبات الإرجاع</a>
     `),
-    text: `Return requested for ${r.orderNumber}\nCustomer: ${r.customerEmail}\nReason: ${r.reason}\nItems: ${r.items.map((i) => `${i.title} ×${i.qty}`).join(", ")}\n${SITE}/admin/returns`,
+    text: `طلب إرجاع للطلب ${r.orderNumber}\nالعميل: ${r.customerEmail}\nالسبب: ${r.reason}\nالمنتجات: ${r.items.map((i) => `${i.title} ×${i.qty}`).join("، ")}\n${SITE}/admin/returns`,
   });
 }
 
