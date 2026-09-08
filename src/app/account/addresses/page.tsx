@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { EG_GOVERNORATES, governorateName } from "@/lib/governorates";
 
 export const metadata = { title: "My Addresses" };
 
@@ -21,6 +22,7 @@ async function saveAddress(formData: FormData) {
     line1: (formData.get("line1") as string)?.trim() ?? "",
     line2: (formData.get("line2") as string)?.trim() || null,
     city: (formData.get("city") as string)?.trim() ?? "",
+    governorate: (formData.get("governorate") as string)?.trim() || null,
     state: (formData.get("state") as string)?.trim() || null,
     postcode: (formData.get("postcode") as string)?.trim() || null,
     country: (formData.get("country") as string) || "EG",
@@ -74,7 +76,9 @@ export default async function AddressesPage({ searchParams }: { searchParams: { 
     line1: "العنوان (السطر الأول) *",
     line2: "العنوان (السطر الثاني)",
     city: "المدينة *",
-    state: "المحافظة",
+    governorate: "المحافظة (داخل مصر)",
+    selectGovernorate: "اختر المحافظة…",
+    state: "المنطقة / الولاية (خارج مصر)",
     postcode: "الرمز البريدي",
     setDefault: "تعيين كعنوان افتراضي",
     saveChanges: "حفظ التغييرات",
@@ -137,6 +141,19 @@ export default async function AddressesPage({ searchParams }: { searchParams: { 
             <AF label={t.line2} name="line2" defaultValue={editing?.line2 ?? ""} />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <AF label={t.city} name="city" required defaultValue={editing?.city ?? ""} />
+              <div>
+                <label className="block text-[12px] font-bold uppercase tracking-wide text-[#555] mb-1.5">{t.governorate}</label>
+                <select
+                  name="governorate"
+                  defaultValue={editing?.governorate ?? ""}
+                  className="w-full px-4 py-3 border border-[#ddd] text-[14px] bg-white outline-none focus:border-brand"
+                >
+                  <option value="">{t.selectGovernorate}</option>
+                  {EG_GOVERNORATES.map((g) => (
+                    <option key={g.code} value={g.code}>{g.ar}</option>
+                  ))}
+                </select>
+              </div>
               <AF label={t.state} name="state" defaultValue={editing?.state ?? ""} />
               <AF label={t.postcode} name="postcode" defaultValue={editing?.postcode ?? ""} />
             </div>
@@ -186,7 +203,7 @@ export default async function AddressesPage({ searchParams }: { searchParams: { 
                 <p>{addr.phone}</p>
                 <p>{addr.line1}</p>
                 {addr.line2 && <p>{addr.line2}</p>}
-                <p>{[addr.city, addr.state, addr.postcode].filter(Boolean).join("، ")}</p>
+                <p>{[addr.city, addr.governorate ? governorateName(addr.governorate) : addr.state, addr.postcode].filter(Boolean).join("، ")}</p>
                 <p>{countryName(addr.country)}</p>
               </div>
               <div className="flex items-center gap-4 mt-4 pt-3 border-t border-[#eee]">

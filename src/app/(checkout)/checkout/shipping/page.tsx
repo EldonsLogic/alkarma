@@ -10,6 +10,21 @@ import type { ResolvedRate } from "@/lib/shipping";
 import { EG_GOVERNORATES } from "@/lib/governorates";
 import { CheckoutProgress, OrderSummary } from "../components";
 
+interface SavedAddress {
+  id: string;
+  label: string | null;
+  fullName: string;
+  phone: string;
+  line1: string;
+  line2: string | null;
+  city: string;
+  state: string | null;
+  governorate: string | null;
+  postcode: string | null;
+  country: string;
+  isDefault: boolean;
+}
+
 export default function ShippingPage() {
   const router = useRouter();
   const { items, subtotal, couponCode } = useCartStore();
@@ -40,6 +55,8 @@ export default function ShippingPage() {
   const [rates, setRates] = useState<ResolvedRate[]>([]);
   const [selectedRate, setSelectedRate] = useState<string>("");
   const [saving, setSaving] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
 
   // Prefill the email from the account when signed in.
   useEffect(() => {
@@ -71,9 +88,36 @@ export default function ShippingPage() {
     return () => ctrl.abort();
   }, [address.country, address.governorate, sub, needsGovernorate]);
 
+  // Load saved addresses so a returning customer can skip retyping everything
+  // — including the governorate, which the shipping rate lookup depends on.
+  useEffect(() => {
+    if (!loggedIn) return;
+    fetch("/api/addresses")
+      .then((r) => r.json())
+      .then((data: { addresses: SavedAddress[] }) => {
+        setSavedAddresses(data.addresses ?? []);
+        const def = data.addresses?.find((a) => a.isDefault) ?? data.addresses?.[0];
+        if (def) applySavedAddress(def);
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loggedIn]);
+
+  function applySavedAddress(a: SavedAddress) {
+    setSelectedAddressId(a.id);
+    setAddress({
+      fullName: a.fullName, phone: a.phone, line1: a.line1, line2: a.line2 ?? "",
+      city: a.city, state: a.state ?? "", governorate: a.governorate ?? "",
+      postcode: a.postcode ?? "", country: a.country,
+    });
+  }
+
   function set(key: string) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      // A manual edit means the form no longer exactly matches a saved address.
+      setSelectedAddressId("");
       setAddress((a) => ({ ...a, [key]: e.target.value }));
+    };
   }
 
   async function handleContinue(e: React.FormEvent) {
@@ -95,6 +139,30 @@ export default function ShippingPage() {
           <h2 className="font-display text-[22px] font-bold text-ink mt-8 mb-5 pb-3 border-b-2 border-brand">
             عنوان الشحن
           </h2>
+
+          {savedAddresses.length > 0 && (
+            <div className="mb-5">
+              <label className="block price-mono text-[11px] tracking-[0.1em] text-ink-muted mb-1.5">
+                استخدم عنوانًا محفوظًا
+              </label>
+              <select
+                value={selectedAddressId}
+                onChange={(e) => {
+                  const found = savedAddresses.find((a) => a.id === e.target.value);
+                  if (found) applySavedAddress(found);
+                  else setSelectedAddressId("");
+                }}
+                className="w-full px-4 py-3 border border-paper-dark bg-paper text-[14px] text-ink outline-none focus:border-brand transition-colors"
+              >
+                <option value="">إدخال عنوان جديد…</option>
+                {savedAddresses.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.label ? `${a.label} — ` : ""}{a.fullName}، {a.line1}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <form onSubmit={handleContinue} className="space-y-4">
             <div>
