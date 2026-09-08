@@ -22,6 +22,9 @@ async function saveAuthor(formData: FormData) {
     bio: (formData.get("bio") as string)?.trim() || null,
     bioAr: (formData.get("bioAr") as string)?.trim() || null,
     photoUrl: (formData.get("photoUrl") as string)?.trim() || null,
+    isFeatured: formData.get("isFeatured") === "on",
+    featuredColor: (formData.get("featuredColor") as string)?.trim() || null,
+    sortOrder: parseInt((formData.get("sortOrder") as string) || "0", 10) || 0,
   };
 
   const session = await auth();
@@ -103,6 +106,30 @@ export default async function AdminAuthorsPage({ searchParams }: { searchParams:
                 dimensions="400 × 400 px"
                 dimensionsNote="(square — displayed as circle)"
               />
+            {/* Homepage "أعمال <author>" banner row. Needs a photo to render. */}
+            <div className="border border-[#e2e8f0] rounded-sm p-4 space-y-3">
+              <label className="flex items-center gap-2 text-[13px] font-bold text-[#1e293b]">
+                <input type="checkbox" name="isFeatured" defaultChecked={editing?.isFeatured ?? false} className="accent-[#3b82f6]" />
+                Feature on homepage (author banner row)
+              </label>
+              <p className="text-[11px] text-[#64748b] -mt-1">
+                Requires an author photo. Up to 6 featured authors are shown.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <AF
+                  label="Banner accent colour"
+                  name="featuredColor"
+                  defaultValue={editing?.featuredColor ?? ""}
+                  placeholder="#7A4A20"
+                />
+                <AF
+                  label="Sort order"
+                  name="sortOrder"
+                  type="number"
+                  defaultValue={String(editing?.sortOrder ?? 0)}
+                />
+              </div>
+            </div>
             <div className="space-y-3">
               <div>
                 <label className="block text-[12px] font-bold uppercase tracking-wide text-[#64748b] mb-1.5">Biography (English)</label>

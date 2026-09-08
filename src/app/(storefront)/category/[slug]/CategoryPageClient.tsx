@@ -11,6 +11,7 @@ import { useCartStore } from "@/stores/cart.store";
 import { effectivePrices } from "@/lib/currency";
 import type { BookSummary, CategorySummary } from "@/types";
 import { Pagination } from "@/components/storefront/Pagination";
+import { RecentlyViewed } from "@/components/storefront/RecentlyViewed";
 
 interface CategoryData extends CategorySummary {
   children: CategorySummary[];
@@ -344,6 +345,8 @@ export function CategoryPageClient({
             searchParams={searchParams}
             basePath={pathname}
           />
+
+          <RecentlyViewed />
 
         </main>
       </div>

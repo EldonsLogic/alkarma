@@ -11,6 +11,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { NewsletterStrip } from "@/components/storefront/NewsletterStrip";
 import type { BookSummary, CategorySummary, BundleSummary } from "@/types";
 import { BOOK_SUMMARY_SELECT } from "@/lib/bookSummarySelect";
+import { FeaturedAuthors } from "@/components/storefront/FeaturedAuthors";
 
 function toNum(v: unknown): number | null {
   if (v == null) return null;
@@ -50,7 +51,7 @@ async function getNewsletterContent() {
 }
 
 async function getHomeData() {
-  const [banners, bestsellers, newReleases, staffPickList, categories, bundles, botmList, adoptList] =
+  const [banners, bestsellers, newReleases, staffPickList, categories, bundles, botmList, adoptList, featuredAuthors] =
     await Promise.all([
       prisma.banner.findMany({
         where: { isActive: true },
@@ -127,6 +128,15 @@ async function getHomeData() {
         take: 12,
         select: BOOK_SUMMARY_SELECT,
       }),
+      // Featured authors for the homepage "أعمال <author>" banner row. Explicit
+      // select, and photoUrl is required — a banner with no portrait is just a
+      // coloured rectangle.
+      prisma.author.findMany({
+        where: { isFeatured: true, photoUrl: { not: null } },
+        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+        take: 6,
+        select: { slug: true, name: true, nameAr: true, photoUrl: true, featuredColor: true },
+      }),
     ]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -162,6 +172,12 @@ async function getHomeData() {
     : null;
 
   return {
+    featuredAuthors: featuredAuthors.map((a) => ({
+      slug: a.slug,
+      name: a.nameAr || a.name,
+      photoUrl: a.photoUrl as string,
+      featuredColor: a.featuredColor,
+    })),
     banners,
     bookOfMonth,
     bestsellers: bestsellers.map(toBookSummary),
@@ -197,7 +213,7 @@ async function getHomeData() {
 }
 
 export default async function HomePage() {
-  const [{ banners, bookOfMonth, bestsellers, newReleases, staffPicks, adopt, categories, bundles }, campaign, newsletter] =
+  const [{ banners, bookOfMonth, bestsellers, newReleases, staffPicks, adopt, categories, bundles, featuredAuthors }, campaign, newsletter] =
     await Promise.all([getHomeData(), getCampaign(), getNewsletterContent()]);
 
   return (
@@ -239,6 +255,8 @@ export default async function HomePage() {
       )}
 
       {/* Adopt a Book — second-hand / slightly damaged copies; hidden when empty */}
+      <Reveal><FeaturedAuthors authors={featuredAuthors} /></Reveal>
+
       {adopt.length > 0 && <Reveal><AdoptSection books={adopt} /></Reveal>}
 
       {/* Book of the Month — hidden entirely when no pick is set */}

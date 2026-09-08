@@ -63,6 +63,23 @@ export default async function BookPage({ params }: Props) {
       })
     : [];
 
+  // A second recommendation row on a DIFFERENT signal to the one above:
+  // books sharing a tag with this one, excluding anything already shown as
+  // "قد يعجبك أيضًا" so the two rows never duplicate each other.
+  const tagIds = book.tags.map((bt) => bt.tagId);
+  const similar = tagIds.length
+    ? await prisma.book.findMany({
+        where: {
+          isActive: true,
+          id: { not: book.id, notIn: related.map((b) => b.id) },
+          tags: { some: { tagId: { in: tagIds } } },
+        },
+        take: 8,
+        orderBy: { salesCount: "desc" },
+        select: BOOK_SUMMARY_SELECT,
+      })
+    : [];
+
   // More by author
   const moreByAuthor = book.authorId
     ? await prisma.book.findMany({
@@ -227,6 +244,16 @@ export default async function BookPage({ params }: Props) {
         reviewCount: book.reviews.length,
       }}
       externalReviews={externalReviews}
+      similar={similar.map((b) => ({
+        id: b.id, slug: b.slug, title: b.title, author: b.author,
+        authorSlug: b.authorRef?.slug ?? null,
+        authors: b.authors.map((ba) => ({ name: ba.author.name, nameAr: ba.author.nameAr, slug: ba.author.slug })),
+        coverUrl: b.coverUrl,
+        priceEgp: Number(b.priceEgp),
+        compareAtEgp: b.compareAtEgp ? Number(b.compareAtEgp) : null,
+        isBestseller: b.isBestseller, isNewRelease: b.isNewRelease, isFeatured: b.isFeatured,
+        salesCount: b.salesCount, stock: b.stock,
+      }))}
       related={related.map((b) => ({
         id: b.id,
         slug: b.slug,

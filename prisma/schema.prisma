@@ -210,6 +210,12 @@ model Author {
   bio       String?
   bioAr     String?
   photoUrl  String?
+  /// Shown in the homepage "أعمال <author>" banner row. Needs photoUrl set.
+  isFeatured Boolean     @default(false)
+  /// Accent colour for that banner's gradient wash, e.g. "#7A4A20". The
+  /// gradient itself is built in the component — only the colour is stored.
+  featuredColor String?
+  sortOrder Int          @default(0)
   books     Book[]       // via Book.authorId (primary author, back-compat)
   bookLinks BookAuthor[] // via BookAuthor join (all authorships, multi-author)
 }

@@ -9,6 +9,8 @@ import { useSession } from "next-auth/react";
 import { PriceDisplay } from "@/components/storefront/PriceDisplay";
 import { StarRating } from "@/components/storefront/StarRating";
 import { BookCarousel } from "@/components/storefront/BookCarousel";
+import { RecentlyViewed } from "@/components/storefront/RecentlyViewed";
+import { recordView } from "@/lib/recently-viewed";
 import { BundleUpsell, type BundleUpsellItem } from "@/components/storefront/BundleUpsell";
 import { formatPrice, getPrice, getCompareAtPrice, effectivePrices } from "@/lib/currency";
 import { gtmViewItem, gtmAddToCart } from "@/lib/gtm";
@@ -52,7 +54,8 @@ const STRINGS = {
     langAr: "العربية",
     youMayLike: "قد يعجبك أيضًا",
     customersAlso: "اشترى العملاء أيضًا",
-    relatedBooks: "كتب ذات صلة",
+    relatedBooks: "قد يعجبك أيضًا",
+    similarBooks: "كتب مشابهة لاختيارك",
     moreBy: (author: string) => `المزيد من ${author}`,
     sameAuthor: "نفس المؤلف",
     bestseller: "الأكثر مبيعًا",
@@ -77,13 +80,14 @@ const STRINGS = {
 interface Props {
   book: BookDetail;
   related: BookSummary[];
+  similar: BookSummary[];
   moreByAuthor: BookSummary[];
   externalReviews?: ExternalReviewData;
   bundleUpsells?: BundleUpsellItem[];
 }
 
 
-export function PDPClient({ book, related, moreByAuthor, externalReviews, bundleUpsells = [] }: Props) {
+export function PDPClient({ book, related, similar, moreByAuthor, externalReviews, bundleUpsells = [] }: Props) {
   const t = STRINGS;
   // Gallery: main cover + any additional photos
   const galleryImages = Array.from(new Set([book.coverUrl, ...(book.images ?? [])].filter(Boolean)));
@@ -100,6 +104,11 @@ export function PDPClient({ book, related, moreByAuthor, externalReviews, bundle
 
   const inStock = book.stock > 0;
   const lowStock = book.stock > 0 && book.stock <= 3;
+
+  // Remember this book for the visitor's "آخر المشاهدات" strip.
+  useEffect(() => {
+    recordView(book.slug);
+  }, [book.slug]);
 
   // GA4 view_item
   useEffect(() => {
@@ -429,11 +438,19 @@ export function PDPClient({ book, related, moreByAuthor, externalReviews, bundle
           <BookCarousel title={t.relatedBooks} books={related} />
         </div>
       )}
+      {similar.length > 0 && (
+        <div className="max-w-[1200px] mx-auto">
+          <BookCarousel title={t.similarBooks} books={similar} />
+        </div>
+      )}
+
       {moreByAuthor.length > 0 && (
         <div className="border-t border-paper-dark bg-paper-mid">
           <BookCarousel title={t.moreBy(book.author)} overline={t.sameAuthor} books={moreByAuthor} />
         </div>
       )}
+
+      <RecentlyViewed excludeSlug={book.slug} />
 
       {/* ─── Sticky Buy Bar ─────────────────────────────────────────────── */}
       <div
