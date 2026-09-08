@@ -77,7 +77,7 @@ const SOCIALS = [
   { key: "tiktok_url",    label: "تيك توك",  Icon: TikTokIcon,    bg: "#5F6368", fg: "#fff" },
   { key: "instagram_url", label: "إنستجرام", Icon: InstagramIcon, bg: "#FFFFFF", fg: "#111" },
   { key: "facebook_url",  label: "فيسبوك",   Icon: FacebookIcon,  bg: "#3B5998", fg: "#fff" },
-  { key: "youtube_url",   label: "يوتيوب",   Icon: YouTubeIcon,   bg: "#CD201F", fg: "#fff" },
+  { key: "youtube_url",   label: "يوتيوب",   Icon: YouTubeIcon,   bg: "#FF0000", fg: "#fff" },
   { key: "whatsapp_url",  label: "واتساب",   Icon: WhatsAppIcon,  bg: "#25D366", fg: "#fff" },
   { key: "x_url",         label: "إكس",      Icon: XIcon,         bg: "#FFFFFF", fg: "#111" },
 ] as const;
@@ -94,6 +94,12 @@ async function getSocialLinks(): Promise<Record<string, string>> {
   }
 }
 
+/**
+ * NOTE: the footer uses logo-footer.png, NOT the header's logo.png.
+ * The header logo is dark ink intended for a white bar; on the footer's black
+ * background it renders invisible. This is the store's own "negative" variant,
+ * the same asset the live site serves in its footer.
+ */
 export async function Footer() {
   const [{ shop: dbShop, help: dbHelp, legal: dbLegal }, social, storeInfo] = await Promise.all([
     getFooterLinks(),
@@ -141,7 +147,13 @@ export async function Footer() {
           {/* About */}
           <div>
             <div className="mb-3 opacity-70">
-              <Image src="/logo.png" alt={BRAND_SHORT_AR} width={88} height={29} className="h-[29px] w-auto" />
+              <Image
+                src="/logo-footer.png"
+                alt={BRAND_SHORT_AR}
+                width={110}
+                height={125}
+                className="h-[125px] w-auto"
+              />
             </div>
             <p className="text-[13px] text-paper-dark/70 leading-relaxed">{tagline}</p>
           </div>

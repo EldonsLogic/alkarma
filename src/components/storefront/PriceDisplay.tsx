@@ -16,7 +16,7 @@ export function PriceDisplay({ item, className = "", size = "md", showCompare = 
   const onSale = showCompare && comparePrice != null && comparePrice > currentPrice;
 
   const sizeClasses: Record<string, string> = {
-    sm: "text-[14px]",
+    sm: "text-[15px]",
     md: "text-[16px]",
     lg: "text-[28px]",
   };
@@ -31,7 +31,7 @@ export function PriceDisplay({ item, className = "", size = "md", showCompare = 
   // rather than setting them side by side.
   return (
     <div className={`flex flex-col items-start gap-0.5 ${className}`}>
-      <span className={`price-mono font-bold text-brand ${sizeClasses[size]}`}>
+      <span className={`price-mono font-normal text-ink ${sizeClasses[size]}`}>
         {formatPrice(currentPrice)}
       </span>
       {onSale && comparePrice != null && (

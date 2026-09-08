@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { PriceDisplay } from "./PriceDisplay";
 import { StarRating } from "./StarRating";
@@ -24,7 +23,6 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const { addItem, openDrawer } = useCartStore();
   const { data: session } = useSession();
-  const router = useRouter();
 
   const cartPayload = {
     id: book.id,
@@ -42,12 +40,6 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
     setAdded(true);
     openDrawer();
     setTimeout(() => setAdded(false), 2000);
-  }
-
-  function handleBuyNow(e: React.MouseEvent) {
-    e.preventDefault();
-    addItem(cartPayload);
-    router.push("/cart");
   }
 
   async function handleWishlist(e: React.MouseEvent) {
@@ -79,21 +71,21 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
   const discount = savingsPercent(book);
 
   return (
-    <Link href={`/book/${book.slug}`} className="group flex flex-col w-[140px] flex-shrink-0 cursor-pointer">
+    <Link href={`/book/${book.slug}`} className="group flex flex-col w-[143px] sm:w-[172px] flex-shrink-0 cursor-pointer">
       {/* Cover */}
       <div className="relative flex-shrink-0">
         {book.coverUrl ? (
           <Image
             src={book.coverUrl}
             alt={displayTitle}
-            width={140}
-            height={210}
-            sizes="(max-width: 640px) 120px, 140px"
+            width={172}
+            height={172}
+            sizes="(max-width: 640px) 143px, 172px"
             priority={priority}
-            className="book-cover-img w-[140px] h-[210px] object-cover block shadow-book"
+            className="book-cover-img w-[143px] h-[143px] sm:w-[172px] sm:h-[172px] object-contain block bg-paper"
           />
         ) : (
-          <div className="book-cover-img w-[140px] h-[210px] bg-gradient-to-br from-paper-dark to-paper-mid flex items-center justify-center shadow-book p-3">
+          <div className="book-cover-img w-[143px] h-[143px] sm:w-[172px] sm:h-[172px] bg-paper-mid flex items-center justify-center p-3">
             <span className="text-[11px] text-ink-muted text-center leading-snug">{displayTitle}</span>
           </div>
         )}
@@ -148,11 +140,11 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
 
       {/* Info */}
       <div className="pt-[10px] pb-1 flex flex-col flex-1">
-        <p dir="auto" className="font-display text-[13px] font-semibold text-ink leading-snug line-clamp-2 mb-[3px] h-[40px] overflow-hidden">
+        <p dir="auto" className="font-display text-[14px] font-normal text-ink leading-snug line-clamp-2 mb-[3px] h-[44px] overflow-hidden">
           {displayTitle}
         </p>
         {book.authors && book.authors.length > 0 ? (
-          <p dir="auto" className="text-[12px] text-ink-muted mb-[5px] line-clamp-1">
+          <p dir="auto" className="text-[14px] text-ink mb-[5px] line-clamp-1">
             {book.authors.map((a, i) => (
               <span key={a.slug}>
                 {i > 0 && "، "}
@@ -171,12 +163,12 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
             href={`/author/${book.authorSlug}`}
             onClick={(e) => e.stopPropagation()}
             dir="auto"
-            className="text-[12px] text-ink-muted hover:text-brand transition-colors mb-[5px] line-clamp-1 block"
+            className="text-[14px] text-ink hover:text-brand transition-colors mb-[5px] line-clamp-1 block"
           >
             {book.author}
           </Link>
         ) : (
-          <p dir="auto" className="text-[12px] text-ink-muted mb-[5px] line-clamp-1">{book.author}</p>
+          <p dir="auto" className="text-[14px] text-ink mb-[5px] line-clamp-1">{book.author}</p>
         )}
         {book.averageRating !== undefined && book.reviewCount !== undefined && (
           <StarRating rating={book.averageRating} count={book.reviewCount} />
@@ -184,22 +176,17 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
         <PriceDisplay item={book} size="sm" className="mt-1" />
       </div>
 
-      {/* Buy Now + Add to Cart */}
+      {/* Card action — the live site shows a SINGLE grey "add to cart" button
+          (no buy-now on the card), revealed on hover at desktop and always
+          visible on touch, where there is no hover. */}
       {showAddToCart && (
-        <div className="mt-auto flex flex-col sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
-          <button
-            onClick={handleBuyNow}
-            className="w-full py-[6px] bg-ink hover:bg-ink/80 text-paper text-[11px] font-bold tracking-[0.04em] uppercase transition-colors"
-            aria-label={`اشترِ ${displayTitle} الآن`}
-          >
-            اشترِ الآن
-          </button>
+        <div className="mt-auto pt-2 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
           <button
             onClick={handleAddToCart}
-            className="w-full py-[6px] bg-brand hover:bg-brand-dark text-white text-[11px] font-bold tracking-[0.04em] uppercase transition-colors"
+            className="w-full py-[7px] bg-[#BCBCBC] hover:bg-[#a9a9a9] text-white text-[13px] font-bold rounded-[3px] transition-colors"
             aria-label={`أضف ${displayTitle} إلى السلة`}
           >
-            {added ? "تمت الإضافة ✓" : "أضف للسلة"}
+            {added ? "تمت الإضافة ✓" : "إضافة إلى السلة"}
           </button>
         </div>
       )}

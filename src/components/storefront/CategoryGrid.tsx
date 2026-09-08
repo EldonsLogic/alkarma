@@ -25,7 +25,7 @@ export function CategoryGrid({ categories, title }: Props) {
       {title && (
         <div className="mb-6 pb-4 border-b-2 border-brand">
           <span className="section-overline">استعرض حسب النوع</span>
-          <h2 className="font-display font-bold text-ink leading-tight" style={{ fontSize: "clamp(24px, 3vw, 36px)" }}>
+          <h2 className="font-display font-bold text-brand leading-tight text-[20px] sm:text-[22px]">
             استعرض حسب القسم
           </h2>
         </div>

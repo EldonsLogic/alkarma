@@ -8,9 +8,9 @@
    site: brand red on a white / light-grey ground with black body copy. */
 :root {
   /* Brand red */
-  --brand:        #CD201F;
-  --brand-dark:   #A81A19;
-  --brand-pale:   #FDECEC;
+  --brand:        #FF0000;
+  --brand-dark:   #E50000;
+  --brand-pale:   #FFECEC;
 
   /* Text */
   --ink:          #000000;
@@ -47,7 +47,8 @@ body {
   background: var(--paper-mid);
   color: var(--ink);
   font-size: 14px;
-  line-height: 1.8;
+  /* live site: 26px on a 14px base */
+  line-height: 1.857;
 }
 
 @media (max-width: 640px) {
@@ -155,7 +156,8 @@ input, select, textarea { font-family: inherit; }
    perturbing the Arabic text around it. */
 .price-mono {
   font-family: var(--font-cairo), system-ui, sans-serif;
-  font-weight: 700;
+  /* Weight is left to the utility class on each usage — the live site sets
+     card prices at regular weight and only emphasises them on the PDP. */
   direction: ltr;
   unicode-bidi: isolate;
 }
@@ -234,7 +236,7 @@ input, select, textarea { font-family: inherit; }
   color: var(--ink, #000000);
   margin: 0 0 20px;
   padding-bottom: 10px;
-  border-bottom: 2px solid #cd201f;
+  border-bottom: 2px solid #ff0000;
 }
 .legal-doc h3 {
   font-size: 17px;
@@ -249,4 +251,4 @@ input, select, textarea { font-family: inherit; }
 .legal-doc ol { list-style: decimal; }
 .legal-doc li { margin-bottom: 10px; }
 .legal-doc strong { color: var(--ink, #000000); font-weight: 700; }
-.legal-doc a { color: #cd201f; text-decoration: underline; }
+.legal-doc a { color: #ff0000; text-decoration: underline; }

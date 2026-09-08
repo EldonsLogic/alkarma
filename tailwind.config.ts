@@ -12,10 +12,10 @@ const config: Config = {
       colors: {
         // Primary action — the Alkarma brand red, taken from the live site.
         brand: {
-          DEFAULT: "#CD201F",
-          dark: "#A81A19",
-          light: "#FDECEC",
-          pale: "#FDECEC",
+          DEFAULT: "#FF0000",
+          dark: "#E50000",
+          light: "#FFECEC",
+          pale: "#FFECEC",
         },
         // Text tones — the live site sets plain black body copy on white.
         ink: {

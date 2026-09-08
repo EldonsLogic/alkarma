@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useUIStore } from "@/stores/ui.store";
 
-// Default banner shown whenever the admin hasn't set custom promo text.
-// Replaces the old free-shipping-threshold message (removed — no longer applicable).
-const DEFAULT_PROMO = "🚚 توصيل سريع في جميع أنحاء مصر خلال ٥-٦ أيام عمل";
+// The live storefront has no promo strip above the header, so this renders
+// NOTHING unless an admin sets promo text in Admin → Content. The feature is
+// kept (it is genuinely useful for campaigns) but is off by default rather
+// than shipping a message the real site doesn't show.
 
 export function PromoBar() {
   const { promoVisible, dismissPromo } = useUIStore();
@@ -24,8 +25,7 @@ export function PromoBar() {
 
   if (!promoVisible) return null;
 
-  const custom = data?.promoTextAr;
-  const content: React.ReactNode = custom || DEFAULT_PROMO;
+  const content: React.ReactNode = data?.promoTextAr?.trim() || null;
 
   if (!content) return null;
 

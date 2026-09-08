@@ -28,8 +28,8 @@ export function AccountNav({ onSignOut }: { onSignOut: () => void }) {
             href={item.href}
             className={`block px-4 sm:px-5 py-3 text-[13px] font-bold border-b-0 sm:border-b border-r sm:border-r-0 border-[#eee] transition-colors whitespace-nowrap last:border-r-0 sm:last:border-b-0 ${
               isActive
-                ? "text-brand bg-[#FDECEC] border-l-2 sm:border-l-0 sm:border-r-2 border-brand"
-                : "text-[#333] hover:text-brand hover:bg-[#FDECEC]"
+                ? "text-brand bg-[#FFECEC] border-l-2 sm:border-l-0 sm:border-r-2 border-brand"
+                : "text-[#333] hover:text-brand hover:bg-[#FFECEC]"
             }`}
           >
             {item.ar}

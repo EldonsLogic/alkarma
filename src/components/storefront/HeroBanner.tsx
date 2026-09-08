@@ -54,13 +54,13 @@ export function HeroBanner({ banners }: Props) {
   // No banners uploaded yet — simple branded fallback
   if (slides.length === 0) {
     return (
-      <section className="relative w-full bg-[#0d0c0a] text-paper flex items-center justify-center aspect-[4/5] sm:aspect-[8/3]">
+      <section className="mx-4 sm:mx-10 my-5 relative bg-paper border border-paper-dark text-ink flex items-center justify-center aspect-[16/9] sm:aspect-[1170/330]">
         <div className="text-center px-6">
-          <p className="font-mono text-[11px] tracking-[0.22em] uppercase text-brand mb-3">{BRAND_SHORT_AR}</p>
-          <h1 className="font-display font-bold text-paper mb-5" style={{ fontSize: "clamp(28px,4vw,48px)" }}>
+          <p className="text-[12px] text-ink-muted mb-3">{BRAND_SHORT_AR}</p>
+          <h1 className="font-display font-bold text-brand mb-5 text-[20px] sm:text-[22px]">
             اكتشف قراءتك القادمة
           </h1>
-          <Link href="/bestsellers" className="inline-block bg-brand hover:bg-brand-dark text-white px-8 py-3 text-[13px] font-bold uppercase tracking-[0.08em] transition-colors">
+          <Link href="/bestsellers" className="inline-block bg-brand hover:bg-brand-dark text-white px-7 py-2.5 text-[14px] font-bold transition-colors">
             تسوق الآن
           </Link>
         </div>
@@ -69,8 +69,8 @@ export function HeroBanner({ banners }: Props) {
   }
 
   return (
-    <section className="relative w-full">
-      <div className="relative w-full aspect-[4/5] sm:aspect-[8/3] overflow-hidden bg-paper-mid">
+    <section className="relative mx-4 sm:mx-10 my-5">
+      <div className="relative w-full aspect-[16/9] sm:aspect-[1170/330] overflow-hidden bg-paper-mid">
         {slides.map((b, i) => {
           const inner = (
             <>

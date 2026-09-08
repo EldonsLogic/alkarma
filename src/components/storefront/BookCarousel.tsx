@@ -24,7 +24,7 @@ export function BookCarousel({ title, overline, books, viewAllHref }: Props) {
       <div className="flex items-center justify-between gap-4 px-5 sm:px-7 py-4 border-b border-paper-dark">
         <div className="min-w-0">
           {overline && <span className="section-overline">{overline}</span>}
-          <h2 className="font-display font-bold text-brand leading-tight text-[18px] sm:text-[20px] truncate">
+          <h2 className="font-display font-bold text-brand leading-tight text-[20px] sm:text-[22px] truncate">
             {title}
           </h2>
         </div>

@@ -219,7 +219,7 @@ export function Header({ navCategories }: Props) {
             <Link
               key={link.href}
               href={link.href}
-              className="px-4 py-[13px] text-[13.5px] font-semibold whitespace-nowrap border-b-2 border-transparent text-ink hover:text-brand hover:border-brand transition-all"
+              className="px-5 py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 border-transparent text-ink hover:text-brand hover:border-brand transition-all"
             >
               {link.label}
             </Link>
@@ -232,7 +232,7 @@ export function Header({ navCategories }: Props) {
               onMouseLeave={scheduleClose}
             >
               {(() => {
-                const cls = `flex items-center gap-1 px-4 py-[13px] text-[13.5px] font-semibold whitespace-nowrap border-b-2 transition-all ${
+                const cls = `flex items-center gap-1 px-5 py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 transition-all ${
                   hoveredMenu === mother.key
                     ? "text-brand border-brand"
                     : "text-ink border-transparent hover:text-brand hover:border-brand"
@@ -264,7 +264,7 @@ export function Header({ navCategories }: Props) {
             <Link
               key={link.href}
               href={link.href}
-              className="px-4 py-[13px] text-[13.5px] font-semibold whitespace-nowrap border-b-2 border-transparent text-ink hover:text-brand hover:border-brand transition-all"
+              className="px-5 py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 border-transparent text-ink hover:text-brand hover:border-brand transition-all"
             >
               {link.label}
             </Link>
@@ -277,38 +277,46 @@ export function Header({ navCategories }: Props) {
           )}
         </div>
 
-        {/* ── Mega-menu panel — parent categories as columns, each with its subs ── */}
+        {/* ── Mega-menu panel ──────────────────────────────────────────────
+            Mirrors the live site: a single "تصفح كل الكتب" heading above a
+            flat five-column list of category links. It is deliberately NOT a
+            set of bold group headers with sub-lists — the live menu has one
+            heading and 33 plain links, and the heavier treatment was the main
+            reason this section didn't read like the real thing. */}
         {activeMother && activeMother.groups.length > 0 && (
           <div
-            className="hidden lg:block absolute start-0 end-0 bg-paper shadow-[0_8px_32px_rgba(26,18,8,0.14)] z-[102] border-t border-paper-dark"
+            className="hidden lg:block absolute start-0 end-0 bg-paper shadow-[0_8px_32px_rgba(0,0,0,0.14)] z-[102] border-t border-paper-dark"
             onMouseEnter={() => openMenu(activeMother.key)}
             onMouseLeave={scheduleClose}
           >
-            <div className="px-4 md:px-10 py-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-8 gap-y-5">
-              {activeMother.groups.map((group) => (
-                <div key={group.slug} className="min-w-[150px]">
-                  <Link
-                    href={`/category/${group.slug}`}
-                    onClick={() => setHoveredMenu(null)}
-                    className="block text-[14px] font-black text-ink hover:text-brand transition-colors mb-1.5 pb-1 border-b-2 border-brand/70"
-                  >
-                    {loc(group.name, group.nameAr)}
-                  </Link>
-                  <ul className="space-y-1">
-                    {group.subcategories.map((sub) => (
-                      <li key={sub.slug}>
-                        <Link
-                          href={`/category/${sub.slug}`}
-                          onClick={() => setHoveredMenu(null)}
-                          className="text-[13px] text-ink-soft hover:text-brand transition-colors"
-                        >
-                          {loc(sub.name, sub.nameAr)}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+            <div className="px-4 lg:px-10 py-7">
+              <Link
+                href="/category"
+                onClick={() => setHoveredMenu(null)}
+                className="inline-block font-display text-[20px] font-bold text-brand mb-5 hover:text-brand-dark transition-colors"
+              >
+                تصفح كل الكتب
+              </Link>
+              {/* CSS columns so links flow down each column, as on the live site */}
+              <ul className="[column-count:2] md:[column-count:3] lg:[column-count:5] [column-gap:2rem]">
+                {activeMother.groups.flatMap((group) => [
+                  { slug: group.slug, label: loc(group.name, group.nameAr) },
+                  ...group.subcategories.map((sub) => ({
+                    slug: sub.slug,
+                    label: loc(sub.name, sub.nameAr),
+                  })),
+                ]).map((c) => (
+                  <li key={c.slug} className="break-inside-avoid">
+                    <Link
+                      href={`/category/${c.slug}`}
+                      onClick={() => setHoveredMenu(null)}
+                      className="block py-[5px] text-[14px] text-ink hover:text-brand transition-colors"
+                    >
+                      {c.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         )}

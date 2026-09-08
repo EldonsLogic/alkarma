@@ -239,7 +239,7 @@ export function CategoryPageClient({
           <button
             onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
             className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-sm text-[12px] font-bold transition-colors ${
-              hasActiveFilters ? "border-brand text-brand bg-[#FDECEC]" : "border-[#ddd] text-[#333]"
+              hasActiveFilters ? "border-brand text-brand bg-[#FFECEC]" : "border-[#ddd] text-[#333]"
             }`}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -356,7 +356,7 @@ export function CategoryPageClient({
 
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="flex items-center gap-1.5 bg-[#FDECEC] border border-brand text-brand text-[12px] font-bold px-3 py-1 rounded-full">
+    <span className="flex items-center gap-1.5 bg-[#FFECEC] border border-brand text-brand text-[12px] font-bold px-3 py-1 rounded-full">
       {label}
       <button onClick={onRemove} className="text-brand text-[14px] leading-none hover:text-brand-dark">×</button>
     </span>
