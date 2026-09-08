@@ -1,0 +1,252 @@
+/* Fonts are self-hosted via next/font — no external @import needed */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design Token: CSS Custom Properties ──────────────────────────────────
+   Values mirror tailwind.config.ts. Sampled from the live alkarmabooks.com
+   site: brand red on a white / light-grey ground with black body copy. */
+:root {
+  /* Brand red */
+  --brand:        #CD201F;
+  --brand-dark:   #A81A19;
+  --brand-pale:   #FDECEC;
+
+  /* Text */
+  --ink:          #000000;
+  --ink-soft:     #333333;
+  --ink-muted:    #696969;
+
+  /* Surfaces: `paper` = card/header white, `mid` = page ground, `dark` = hairline */
+  --paper:        #FFFFFF;
+  --paper-mid:    #F0F0F0;
+  --paper-dark:   #DDDDDD;
+
+  /* Gold (loyalty / premium) */
+  --gold:         #B5922A;
+
+  /* Status — functional only */
+  --success:      #2E7D52;
+  --error:        #C0392B;
+}
+
+/* ── Box sizing ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── Base HTML ── */
+html {
+  font-family: var(--font-cairo), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  /* The live site sits cards on a light-grey ground, not on white. */
+  background: var(--paper-mid);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+@media (max-width: 640px) {
+  body { font-size: 14px; }
+}
+
+/* Single family across the whole site — no RTL font swap needed. */
+
+/* ── Arabic typography fixes ──────────────────────────────────────────────
+   Arabic is a cursive script: letters MUST connect. CSS letter-spacing
+   (Tailwind's tracking-* utilities) forces gaps between letters and breaks
+   the joins, making text look "broken". Arabic also has no letter-case, so
+   `uppercase` does nothing to Arabic but still shouts at any Latin fragment
+   caught in the same label. Neutralising both here is far safer than editing
+   ~300 individual `tracking-*` / `uppercase` class usages. */
+html[dir="rtl"] * {
+  letter-spacing: 0 !important;
+  word-spacing: normal !important;
+  text-transform: none !important;
+}
+/* Arabic must never be set in a Latin-only monospace stack — it has no Arabic
+   glyphs, so the browser substitutes per character and the cursive joins
+   break. Cairo covers both scripts, so force it for these label classes. */
+.font-mono, .section-overline, .tag, .price-mono {
+  font-family: var(--font-cairo), system-ui, sans-serif;
+}
+
+/* Prices are the one place a Latin run must keep its own direction. */
+html[dir="rtl"] .price-mono {
+  letter-spacing: normal !important;
+}
+/* Cairo covers Arabic and Latin, so nothing needs a font swap under RTL. */
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar         { width: 6px; height: 6px; }
+::-webkit-scrollbar-track   { background: var(--paper-mid); }
+::-webkit-scrollbar-thumb   { background: var(--paper-dark); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-muted); }
+
+/* ── Focus ring ── */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* ── Resets ── */
+a                      { text-decoration: none; color: inherit; }
+button                 { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+
+/* ── Line-clamp ── */
+.line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ── Book cover hover ── */
+.book-cover-img {
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+}
+.group:hover .book-cover-img {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(26,18,8,0.18);
+}
+
+/* ── Page container ── */
+.page-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+@media (max-width: 768px) {
+  .page-container { padding: 0 20px; }
+}
+
+/* ── Section overline: small brand-red label above a heading ──────────────
+   No uppercase transform: Arabic has no case, and `text-transform` plus wide
+   letter-spacing would only damage the Latin fragments that appear in it. */
+.section-overline {
+  font-family: var(--font-cairo), system-ui, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--brand);
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* ── Left-border intro text accent ── */
+.intro-text {
+  border-left: 3px solid var(--brand);
+  padding-left: 20px;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--ink-soft);
+}
+
+/* ── Price ────────────────────────────────────────────────────────────────
+   Prices are set in Cairo (as on the live site), and forced LTR.
+
+   Why the direction matters: a price like "350.00 EGP" is entirely
+   LTR characters, but inside an RTL block the bidi algorithm lays the number
+   run and the currency run out right-to-left, so it VISUALLY reads
+   "EGP 350.00" even though the DOM text is correct. `direction: ltr` restores
+   the intended order and `unicode-bidi: isolate` stops the price from
+   perturbing the Arabic text around it. */
+.price-mono {
+  font-family: var(--font-cairo), system-ui, sans-serif;
+  font-weight: 700;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* ── Tag / chip ── */
+.tag {
+  font-family: var(--font-cairo), system-ui, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  background: var(--brand-pale);
+  color: var(--brand);
+  border: 1px solid rgba(196,98,45,0.3);
+  border-radius: 2px;
+}
+
+/* ── Skeleton shimmer ── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--paper-mid) 25%, var(--paper-dark) 50%, var(--paper-mid) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* ── Scroll reveal ──────────────────────────────────────────────────────────
+   Fade + rise as content enters the viewport. Apple-style ease-out-expo curve.
+   A <noscript> override in <head> keeps content visible without JavaScript. */
+.reveal {
+  opacity: 0;
+  transform: translateY(48px) scale(0.985);
+  transition: opacity 0.7s ease, transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+/* Per-item stagger inside a revealing group (cards cascade one after another) */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(34px);
+  transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-stagger.reveal-in > * {
+  opacity: 1;
+  transform: none;
+}
+.reveal-stagger.reveal-in > *:nth-child(1) { transition-delay: 0.02s; }
+.reveal-stagger.reveal-in > *:nth-child(2) { transition-delay: 0.08s; }
+.reveal-stagger.reveal-in > *:nth-child(3) { transition-delay: 0.14s; }
+.reveal-stagger.reveal-in > *:nth-child(4) { transition-delay: 0.20s; }
+.reveal-stagger.reveal-in > *:nth-child(5) { transition-delay: 0.26s; }
+.reveal-stagger.reveal-in > *:nth-child(6) { transition-delay: 0.32s; }
+.reveal-stagger.reveal-in > *:nth-child(7) { transition-delay: 0.38s; }
+.reveal-stagger.reveal-in > *:nth-child(n+8) { transition-delay: 0.44s; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal.reveal-in,
+  .reveal-stagger > *, .reveal-stagger.reveal-in > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── Long-form legal documents (privacy policy, terms of service) ──────────
+   The markup comes verbatim from the store's published legal pages, so it is
+   plain h2/h3/p/ul/ol/li with no classes — styled here rather than inline. */
+.legal-doc h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink, #000000);
+  margin: 0 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #cd201f;
+}
+.legal-doc h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink, #000000);
+  margin: 32px 0 10px;
+}
+.legal-doc p { margin: 0 0 14px; }
+.legal-doc ul,
+.legal-doc ol { margin: 0 0 18px; padding-inline-start: 22px; }
+.legal-doc ul { list-style: disc; }
+.legal-doc ol { list-style: decimal; }
+.legal-doc li { margin-bottom: 10px; }
+.legal-doc strong { color: var(--ink, #000000); font-weight: 700; }
+.legal-doc a { color: #cd201f; text-decoration: underline; }

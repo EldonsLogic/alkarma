@@ -1,0 +1,55 @@
+# دار الكرمة (Alkarma Books)
+
+> دار الكرمة ("Dar Al Karma" / Alkarma Books) is an Arabic publishing house
+> founded in Cairo, Egypt in 2013, and an online bookstore selling its own
+> titles alongside books from other Arabic publishers. All content, pricing
+> and checkout are Arabic-language and in Egyptian pounds (EGP).
+
+Alkarma publishes Arabic and translated books — with a focus on novels,
+history, biography and memoir, and personal development — and is the publisher
+for a number of leading Egyptian writers including إبراهيم عيسى (Ibrahim Eissa),
+عمر طاهر (Omar Taher), أحمد خالد توفيق (Ahmed Khaled Tawfik),
+محمد المنسي قنديل (Mohamed El-Mansi Qindeel), جلال أمين (Galal Amin) and
+عز الدين شكري فشير (Ezzedine Choukri Fishere).
+
+It was named "Best Publisher" by the Egyptian Publishers Association and the
+General Egyptian Book Organisation in 2020, and won the encouragement award of
+the Sheikh Hamad Award for Translation and International Understanding in 2022.
+
+Notable series: «مختارات الكرمة» (rare and out-of-print Arabic literary works
+in new editions), «ترجمات الكرمة» (selected world fiction in translation), and
+«المكتبة الصوفية الصغيرة» (pocket editions of core Sufi texts).
+
+## Ordering
+
+- Currency: Egyptian pound (EGP) only.
+- Delivery: all governorates of Egypt, in 5–6 working days (excluding Fridays,
+  Saturdays and public holidays), counted from the day after the order.
+- Typical shipping: 80 EGP Greater Cairo · 90 EGP Nile Delta governorates ·
+  120 EGP Upper Egypt.
+- Payment: cash on delivery, or card (Visa, Mastercard, Meeza).
+
+## Key pages
+
+- [الرئيسية / Homepage](https://alkarmabooks.com/): featured, bestselling and new releases
+- [أحدث الإصدارات / New releases](https://alkarmabooks.com/new-releases)
+- [الأكثر مبيعًا / Bestsellers](https://alkarmabooks.com/bestsellers)
+- [التصنيفات / Categories](https://alkarmabooks.com/category)
+- [باقات / Bundles](https://alkarmabooks.com/bundles): curated multi-book sets
+- [كتاب الشهر / Book of the month](https://alkarmabooks.com/book-of-the-month)
+- [الأسئلة الشائعة / FAQ](https://alkarmabooks.com/faq): ordering, shipping, payment, account
+- [الشحن والتوصيل / Shipping](https://alkarmabooks.com/shipping)
+- [الإرجاع والاسترداد / Returns](https://alkarmabooks.com/returns)
+- [عن دار الكرمة / About](https://alkarmabooks.com/about)
+- [تواصل معنا / Contact](https://alkarmabooks.com/contact)
+
+## Full catalogue
+
+The complete, always-current list of book, category, author and bundle pages
+is available at [sitemap.xml](https://alkarmabooks.com/sitemap.xml). Each book
+page includes structured data (title, author, ISBN, price, availability and
+rating) for accurate citation.
+
+## Contact
+
+info@alkarmabooks.com · 01067274880
