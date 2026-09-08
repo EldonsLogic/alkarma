@@ -49,7 +49,9 @@ export async function POST(req: NextRequest) {
     await prisma.$transaction([
       prisma.user.update({
         where: { id: record.userId },
-        data: { passwordHash },
+        // Setting a password completes the migration for an imported account:
+        // from here on it behaves exactly like a normally-registered one.
+        data: { passwordHash, isImported: false },
       }),
       prisma.passwordResetToken.delete({ where: { id: record.id } }),
     ]);

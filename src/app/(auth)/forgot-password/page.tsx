@@ -2,13 +2,17 @@
 
 import { BRAND_SHORT_AR } from "@/lib/brand";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Turnstile } from "@/components/Turnstile";
 
-export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("");
+function ForgotPasswordForm() {
+  // Prefilled when a migrated customer is sent here from the login page, so
+  // they don't have to retype the address they just entered.
+  const searchParams = useSearchParams();
+  const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -110,12 +114,22 @@ export default function ForgotPasswordPage() {
         )}
 
         <p className="text-center text-[13px] text-[#666] mt-6">
-          Remember your password?{" "}
+          تذكّرت كلمة المرور؟{" "}
           <Link href="/login" className="text-brand font-bold hover:underline">
             تسجيل الدخول
           </Link>
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ForgotPasswordPage() {
+  // useSearchParams needs a Suspense boundary to avoid opting the whole route
+  // into client-side rendering.
+  return (
+    <Suspense fallback={null}>
+      <ForgotPasswordForm />
+    </Suspense>
   );
 }

@@ -26,6 +26,14 @@ model User {
   permissions   String[]  // granular permission overrides
   emailVerified DateTime? // NextAuth standard: null = unverified, DateTime = verified at
   image         String?
+  /// True for accounts migrated from the previous site. These are created with
+  /// NO usable password: sign-in must divert such a customer into the
+  /// set-your-password flow instead of accepting a password directly.
+  /// Cleared the moment they set a password, after which it is a normal account.
+  isImported    Boolean   @default(false)
+  /// The customer's identifier in the source export, kept so a re-run can
+  /// match rows idempotently and so support can trace a record back.
+  legacyRef     String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -111,6 +119,9 @@ model Address {
   line1     String
   line2     String?
   city      String
+  /// EG governorate code (see src/lib/governorates.ts). Shipping rates are
+  /// resolved by this, so a saved address without it cannot be priced.
+  governorate String?
   state     String?
   postcode  String?
   country   String  @default("EG")
@@ -385,6 +396,12 @@ model Order {
   refundedAt      DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  /// Set on orders migrated from the previous site. `legacyRef` is the source
+  /// row's identifier; `importedAt` distinguishes migrated history from orders
+  /// actually placed here (orderNumber keeps its ORIGINAL value either way, so
+  /// customers still recognise it).
+  legacyRef       String?
+  importedAt      DateTime?
 
   items       OrderItem[]
   orderNotes  OrderNote[]

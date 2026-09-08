@@ -1,0 +1,3 @@
+order_number,customer_email,order_date,status,payment_method,payment_status,item_title,item_isbn,item_quantity,item_unit_price,order_subtotal,order_shipping_fee,order_discount,order_total,shipping_full_name,shipping_phone,shipping_line1,shipping_line2,shipping_city,shipping_governorate,shipping_postcode,notes
+ALK-100231,mona.hassan@example.com,2023-05-02,DELIVERED,COD,PAID,أنت لم تفهمني بعد,9789779603483,1,180.00,430.00,80.00,0.00,510.00,منى حسن,01001234567,12 شارع البستان,الدور الثالث - شقة 7,المعادي,cairo,11728,
+ALK-100231,mona.hassan@example.com,2023-05-02,DELIVERED,COD,PAID,مختارات الكرمة - الجزء الأول,9789779601234,2,125.00,430.00,80.00,0.00,510.00,منى حسن,01001234567,12 شارع البستان,الدور الثالث - شقة 7,المعادي,cairo,11728,

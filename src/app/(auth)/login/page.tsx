@@ -16,6 +16,7 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsPasswordSetup, setNeedsPasswordSetup] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,6 +27,13 @@ function LoginForm() {
     });
     setLoading(false);
     if (res?.error) {
+      // A customer migrated from the previous site has no password yet — send
+      // them to set one instead of telling them their password is wrong.
+      if (res.code === "imported_account" || /imported_account/i.test(res.error)) {
+        setNeedsPasswordSetup(true);
+        setError("");
+        return;
+      }
       const tooMany = res.code === "too_many_attempts" || /too_many/i.test(res.error);
       setError(
         tooMany
@@ -48,6 +56,22 @@ function LoginForm() {
           <h1 className="text-[24px] font-black">تسجيل الدخول</h1>
           <p className="text-[13px] text-[#666] mt-1">أهلًا بعودتك</p>
         </div>
+
+        {needsPasswordSetup && (
+          <div className="bg-brand-pale border border-brand text-ink text-[13.5px] leading-[1.9] px-4 py-4 mb-4">
+            <p className="font-bold mb-1.5">حسابك موجود بالفعل — لكنه يحتاج كلمة مرور جديدة</p>
+            <p className="mb-3">
+              نقلنا حسابك وسجل طلباتك من موقعنا السابق. لأسباب أمنية لم نَنقل كلمة
+              المرور القديمة، لذا يلزم تعيين كلمة مرور جديدة لمرة واحدة.
+            </p>
+            <Link
+              href={`/forgot-password?email=${encodeURIComponent(email)}`}
+              className="inline-block px-5 py-2.5 bg-brand hover:bg-brand-dark text-white font-bold text-[13px] transition-colors"
+            >
+              تعيين كلمة المرور
+            </Link>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {passwordReset && (

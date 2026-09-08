@@ -10,6 +10,16 @@ class RateLimitError extends CredentialsSignin {
   code = "too_many_attempts";
 }
 
+/**
+ * Raised when a customer migrated from the previous site tries to sign in with
+ * a password. Their account was imported with NO password hash, so no password
+ * can ever be correct — instead of a misleading "wrong password", the login
+ * page uses this code to divert them into the set-your-password flow.
+ */
+class ImportedAccountError extends CredentialsSignin {
+  code = "imported_account";
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
@@ -43,6 +53,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         const user = await prisma.user.findUnique({ where: { email } });
+
+        // Migrated account that has not set a password yet — send them to the
+        // reset flow rather than failing as if they mistyped something.
+        if (user?.isImported && !user.passwordHash) {
+          throw new ImportedAccountError();
+        }
+
         if (!user?.passwordHash) return null;
         const valid = await bcrypt.compare(
           credentials.password as string,

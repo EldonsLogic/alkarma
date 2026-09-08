@@ -1,0 +1,2 @@
+legacy_customer_id,email,first_name,last_name,phone,address_line1,address_line2,city,governorate,postcode,country,created_at
+CUST-1042,mona.hassan@example.com,منى,حسن,01001234567,12 شارع البستان,الدور الثالث - شقة 7,المعادي,cairo,11728,EG,2023-04-18
