@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { BookCarousel } from "@/components/storefront/BookCarousel";
-import { Top10Carousel } from "@/components/storefront/Top10Carousel";
+import { BRAND_AR } from "@/lib/brand";
 import { CategoryGrid } from "@/components/storefront/CategoryGrid";
 import { HeroBanner } from "@/components/storefront/HeroBanner";
 import { CampaignBanner } from "@/components/storefront/CampaignBanner";
@@ -50,8 +50,14 @@ async function getNewsletterContent() {
   };
 }
 
+/**
+ * The live homepage runs four rails of exactly 15 books, laid out 3 x 5 rather
+ * than as a scroller.
+ */
+const RAIL_SIZE = 15;
+
 async function getHomeData() {
-  const [banners, bestsellers, newReleases, staffPickList, categories, bundles, botmList, adoptList, featuredAuthors] =
+  const [banners, bestsellers, newReleases, imprintPicks, offers, staffPickList, categories, bundles, botmList, adoptList, featuredAuthors] =
     await Promise.all([
       prisma.banner.findMany({
         where: { isActive: true },
@@ -63,16 +69,36 @@ async function getHomeData() {
           imageUrlAr: true, imageMobileUrlAr: true, linkUrlAr: true,
         },
       }),
+      // Flagged bestsellers first, then topped up by sales rank. The seed
+      // catalogue only flags 10 books and only 3 have any sales at all, so a
+      // bare isBestseller filter renders a half-empty rail; live's equivalent
+      // is category-driven and always shows a full 3 x 5.
       prisma.book.findMany({
-        where: { type: "BOOK", isActive: true, isBestseller: true },
-        orderBy: { salesCount: "desc" },
-        take: 25,
+        where: { type: "BOOK", isActive: true },
+        orderBy: [{ isBestseller: "desc" }, { salesCount: "desc" }, { createdAt: "desc" }],
+        take: RAIL_SIZE,
         select: BOOK_SUMMARY_SELECT,
       }),
+      // Same treatment: flagged new releases first, then the newest titles.
       prisma.book.findMany({
-        where: { type: "BOOK", isActive: true, isNewRelease: true },
-        orderBy: { createdAt: "desc" },
-        take: 10,
+        where: { type: "BOOK", isActive: true },
+        orderBy: [{ isNewRelease: "desc" }, { createdAt: "desc" }],
+        take: RAIL_SIZE,
+        select: BOOK_SUMMARY_SELECT,
+      }),
+      // "ترشيحات" on the live homepage is the دار الكرمة imprint's own books —
+      // its "المزيد" points at /book-category/دار-الكرمة.
+      prisma.book.findMany({
+        where: { type: "BOOK", isActive: true, publisher: BRAND_AR },
+        orderBy: { salesCount: "desc" },
+        take: RAIL_SIZE,
+        select: BOOK_SUMMARY_SELECT,
+      }),
+      // "عروض وخصومات" — anything actually marked down.
+      prisma.book.findMany({
+        where: { type: "BOOK", isActive: true, compareAtEgp: { not: null } },
+        orderBy: { salesCount: "desc" },
+        take: RAIL_SIZE,
         select: BOOK_SUMMARY_SELECT,
       }),
       prisma.featuredList.findFirst({
@@ -172,6 +198,8 @@ async function getHomeData() {
     : null;
 
   return {
+    imprintPicks: imprintPicks.map(toBookSummary),
+    offers: offers.map(toBookSummary),
     featuredAuthors: featuredAuthors.map((a) => ({
       slug: a.slug,
       name: a.nameAr || a.name,
@@ -213,7 +241,7 @@ async function getHomeData() {
 }
 
 export default async function HomePage() {
-  const [{ banners, bookOfMonth, bestsellers, newReleases, staffPicks, adopt, categories, bundles, featuredAuthors }, campaign, newsletter] =
+  const [{ banners, bookOfMonth, bestsellers, newReleases, imprintPicks, offers, staffPicks, adopt, categories, bundles, featuredAuthors }, campaign, newsletter] =
     await Promise.all([getHomeData(), getCampaign(), getNewsletterContent()]);
 
   return (
@@ -221,16 +249,25 @@ export default async function HomePage() {
       {/* Hero */}
       <HeroBanner banners={banners} />
 
-      {/* Bestsellers — Netflix-style Top 10 ranked list */}
-      <Reveal><Top10Carousel books={bestsellers} /></Reveal>
+      {/* ── The four rails, in the live site's own order ────────────────
+          Live runs أحدث الإصدارات, then الأكثر مبيعًا, then ترشيحات, then
+          عروض وخصومات — each 15 books laid out 3 x 5, with a three-image
+          author-promo strip between them.
 
-      {/* New Releases */}
+          Those promo strips are NOT reproduced here: they are marketing
+          artwork hosted on the live site (03.-Eissa.jpg, Merna-home-midBanner
+          .jpg, 01.-Omar.jpg) linking to author tag pages, and inventing
+          stand-ins would be worse than leaving the slot empty. The existing
+          CampaignBanner sits in the first of those slots instead, since it is
+          the closest thing this store already has. */}
+
       {newReleases.length > 0 && (
         <Reveal>
           <BookCarousel
-            title="إصدارات جديدة"
+            title="أحدث الإصدارات"
             books={newReleases}
             viewAllHref="/new-releases"
+            variant="grid"
           />
         </Reveal>
       )}
@@ -244,7 +281,47 @@ export default async function HomePage() {
         />
       </Reveal>
 
-      {/* Staff Picks */}
+      {bestsellers.length > 0 && (
+        <Reveal>
+          <BookCarousel
+            title="الأكثر مبيعًا"
+            books={bestsellers}
+            viewAllHref="/bestsellers"
+            variant="grid"
+          />
+        </Reveal>
+      )}
+
+      {imprintPicks.length > 0 && (
+        <Reveal>
+          <BookCarousel
+            title="ترشيحات"
+            books={imprintPicks}
+            viewAllHref={`/publisher/${encodeURIComponent(BRAND_AR)}`}
+            variant="grid"
+          />
+        </Reveal>
+      )}
+
+      {/* Only one book in the seed catalogue carries a compareAt price, so this
+          rail stays hidden until there are enough real markdowns to fill a row.
+          Discounts are not invented to pad it. */}
+      {offers.length >= 5 && (
+        <Reveal>
+          <BookCarousel
+            title="عروض وخصومات"
+            books={offers}
+            viewAllHref="/bundles"
+            variant="grid"
+          />
+        </Reveal>
+      )}
+
+      {/* ── Sections below have no counterpart on the live homepage ──────
+          Kept, but moved beneath the live-matching content rather than
+          deleted: each is a real feature of this store with its own route.
+          Flagged for a decision on whether the homepage should carry them. */}
+
       {staffPicks.length > 0 && (
         <Reveal>
           <BookCarousel

@@ -16,6 +16,9 @@ interface Props {
   priority?: boolean;
 }
 
+/** Live prefixes the byline on its product tiles, e.g. "تأليف: ميرنا المهدي". */
+const BYLINE = "تأليف: ";
+
 export function BookCard({ book, showAddToCart = true, priority = false }: Props) {
 
   const [added, setAdded] = useState(false);
@@ -157,11 +160,14 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
 
       {/* Info */}
       <div className="pt-[10px] pb-1 flex flex-col flex-1">
-        <p dir="auto" className="font-display text-[14px] font-normal text-ink leading-snug line-clamp-2 mb-[3px] h-[44px] overflow-hidden">
+        {/* Live's grid title is 16.8px bold, not 14px regular — measured on its
+            own product tiles at 1280. Two lines, then the byline. */}
+        <p dir="auto" className="font-display text-[16.8px] font-bold text-ink leading-snug line-clamp-2 mb-[3px] h-[48px] overflow-hidden">
           {displayTitle}
         </p>
         {book.authors && book.authors.length > 0 ? (
           <p dir="auto" className="text-[14px] text-ink mb-[5px] line-clamp-1">
+            {BYLINE}
             {book.authors.map((a, i) => (
               <span key={a.slug}>
                 {i > 0 && "، "}
@@ -182,10 +188,10 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
             dir="auto"
             className="text-[14px] text-ink hover:text-brand transition-colors mb-[5px] line-clamp-1 block"
           >
-            {book.author}
+            {BYLINE}{book.author}
           </Link>
         ) : (
-          <p dir="auto" className="text-[14px] text-ink mb-[5px] line-clamp-1">{book.author}</p>
+          <p dir="auto" className="text-[14px] text-ink mb-[5px] line-clamp-1">{BYLINE}{book.author}</p>
         )}
         {book.averageRating !== undefined && book.reviewCount !== undefined && (
           <StarRating rating={book.averageRating} count={book.reviewCount} />

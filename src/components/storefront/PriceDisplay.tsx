@@ -16,7 +16,8 @@ export function PriceDisplay({ item, className = "", size = "md", showCompare = 
   const onSale = showCompare && comparePrice != null && comparePrice > currentPrice;
 
   const sizeClasses: Record<string, string> = {
-    sm: "text-[15px]",
+    // "sm" is the product-tile price. Live renders it at 13px.
+    sm: "text-[13px]",
     md: "text-[16px]",
     lg: "text-[28px]",
   };

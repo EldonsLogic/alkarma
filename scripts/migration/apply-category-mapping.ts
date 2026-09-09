@@ -61,7 +61,8 @@ const ORPHAN_FALLBACK: { title: string; slug: string; why: string; review?: stri
 
   if (!DRY) {
     const maxOrder = (await dst.category.aggregate({ _max: { sortOrder: true } }))._max.sortOrder ?? 0;
-    for (const [i, c] of NEW_CATS.entries()) {
+    for (let i = 0; i < NEW_CATS.length; i++) {
+      const c = NEW_CATS[i];
       await dst.category.upsert({
         where: { slug: c.slug },
         update: {},
@@ -103,7 +104,7 @@ const ORPHAN_FALLBACK: { title: string; slug: string; why: string; review?: stri
     pairs.set(`${b.id}|${categoryId}`, { bookId: b.id, categoryId });
   }
 
-  const rows = [...pairs.values()];
+  const rows = Array.from(pairs.values());
   console.log(`source links ${links.length} · unique target links ${rows.length} · dropped ${dropped} (0-book / unmapped categories)`);
   if (DRY) { await src.$disconnect(); await dst.$disconnect(); return; }
 

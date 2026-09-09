@@ -8,6 +8,12 @@ interface Props {
   overline?: string;
   books: BookSummary[];
   viewAllHref?: string;
+  /**
+   * "grid" wraps into rows of five, which is how the live site lays out its
+   * homepage rails — 15 books as 3 x 5, not a scroller. "scroll" keeps the
+   * horizontal scroller used elsewhere (PDP, book of the month).
+   */
+  variant?: "grid" | "scroll";
 }
 
 /**
@@ -16,7 +22,7 @@ interface Props {
  * section title sits in brand red on the leading edge, with a "المزيد" link on
  * the trailing edge.
  */
-export function BookCarousel({ title, overline, books, viewAllHref }: Props) {
+export function BookCarousel({ title, overline, books, viewAllHref, variant = "scroll" }: Props) {
   if (!books.length) return null;
 
   /*
@@ -49,7 +55,11 @@ export function BookCarousel({ title, overline, books, viewAllHref }: Props) {
 
       {/* gap-0 and no inline padding: the gutter is the cards' own padding, as
           on live. Live's row padding is 0 on mobile and 6px from tablet up. */}
-      <div className="flex gap-0 overflow-x-auto px-0 md:px-[6px] py-6 scrollbar-thin">
+      <div
+        className={`flex gap-0 px-0 md:px-[6px] py-6 ${
+          variant === "grid" ? "flex-wrap" : "overflow-x-auto scrollbar-thin"
+        }`}
+      >
         {books.map((book, i) => (
           <BookCard key={book.id} book={book} priority={i < 3} />
         ))}
