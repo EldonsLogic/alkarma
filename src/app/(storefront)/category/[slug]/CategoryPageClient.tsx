@@ -463,33 +463,19 @@ function ProductCard({ book }: { book: BookSummary; }) {
       </div>
       <div className="pt-3 flex flex-col flex-1">
         <p dir="auto" className="font-display text-[14px] sm:text-[15px] font-semibold text-ink line-clamp-2 leading-snug mb-1 h-[44px] overflow-hidden">{book.title}</p>
-        {book.authors && book.authors.length > 0 ? (
-          <p dir="auto" className="text-[12px] text-ink-muted mb-2 line-clamp-1">
-            {book.authors.map((a, i) => (
-              <span key={a.slug}>
-                {i > 0 && "، "}
-                <Link
-                  href={`/author/${a.slug}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="hover:text-brand transition-colors"
-                >
-                  {a.name}
-                </Link>
-              </span>
-            ))}
-          </p>
-        ) : book.authorSlug ? (
-          <Link
-            href={`/author/${book.authorSlug}`}
-            onClick={(e) => e.stopPropagation()}
-            dir="auto"
-            className="text-[12px] text-ink-muted hover:text-brand transition-colors mb-2 line-clamp-1 block"
-          >
-            {book.author}
-          </Link>
-        ) : (
-          <p dir="auto" className="text-[12px] text-ink-muted mb-2 line-clamp-1">{book.author}</p>
-        )}
+        {/* Byline is PLAIN TEXT: this whole card is already a <Link> (an <a>),
+            and an <a> inside an <a> is invalid HTML. The browser unnests it
+            when parsing the server HTML, so React's tree stopped matching the
+            DOM and every listing page threw a hydration error and re-rendered
+            client-side. Same fix as BookCard. */}
+        <p dir="auto" className="text-[12px] text-ink-muted mb-2 line-clamp-1">
+          {(book.authors && book.authors.length > 0
+            ? Array.from(new Set(book.authors.map((a) => a.name)))
+            : [book.author]
+          )
+            .filter(Boolean)
+            .join("، ")}
+        </p>
         <PriceDisplay item={book} size="sm" />
         <div className="mt-auto pt-2 flex flex-col gap-0">
           <button

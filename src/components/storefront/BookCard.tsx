@@ -79,6 +79,15 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
   }
 
   const displayTitle = book.title;
+  // De-duplicated so a book credited to the same person twice does not render
+  // "تأليف: فلان، فلان".
+  const byline = (
+    book.authors && book.authors.length > 0
+      ? Array.from(new Set(book.authors.map((a) => a.name)))
+      : [book.author]
+  )
+    .filter(Boolean)
+    .join("، ");
   const discount = savingsPercent(book);
 
   /*
@@ -182,34 +191,21 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
         <p dir="auto" className="font-display text-[16.8px] font-bold text-ink leading-[20px] line-clamp-2 overflow-hidden">
           {displayTitle}
         </p>
-        {book.authors && book.authors.length > 0 ? (
-          <p dir="auto" className="text-[14px] text-ink leading-[20px] h-[20px] mb-[5px] xl:mb-0 line-clamp-1">
-            {BYLINE}
-            {book.authors.map((a, i) => (
-              <span key={a.slug}>
-                {i > 0 && "، "}
-                <Link
-                  href={`/author/${a.slug}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="hover:text-brand transition-colors"
-                >
-                  {a.name}
-                </Link>
-              </span>
-            ))}
-          </p>
-        ) : book.authorSlug ? (
-          <Link
-            href={`/author/${book.authorSlug}`}
-            onClick={(e) => e.stopPropagation()}
-            dir="auto"
-            className="text-[14px] text-ink leading-[20px] h-[20px] mb-[5px] xl:mb-0 hover:text-brand transition-colors line-clamp-1 block"
-          >
-            {BYLINE}{book.author}
-          </Link>
-        ) : (
-          <p dir="auto" className="text-[14px] text-ink leading-[20px] h-[20px] mb-[5px] xl:mb-0 line-clamp-1">{BYLINE}{book.author}</p>
-        )}
+        {/* Byline — PLAIN TEXT, deliberately not links.
+            The whole card is already an <a> (the Link wrapping it), and HTML
+            forbids nesting an <a> inside an <a>. The browser's parser silently
+            unnests them when it parses the server HTML, so React's client tree
+            no longer matched the DOM and every page rendering a BookCard threw
+            "Expected server HTML to contain a matching <div> in <a>" and fell
+            back to a full client re-render. Rendering the byline as text fixes
+            that, and matches live, which also keeps the byline inside the
+            product link rather than linking the author separately. Authors are
+            still reachable from the product page. */}
+        <p dir="auto" className="text-[14px] text-ink leading-[20px] h-[20px] mb-[5px] xl:mb-0 line-clamp-1">
+          {BYLINE}
+          {byline}
+        </p>
+
         {book.averageRating !== undefined && book.reviewCount !== undefined && (
           <StarRating rating={book.averageRating} count={book.reviewCount} />
         )}
