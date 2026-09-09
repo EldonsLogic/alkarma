@@ -9,7 +9,7 @@ interface Props {
 
 import { canonical } from "@/lib/seo";
 
-export const metadata = { title: "Arabic Books", ...canonical("/arabic-books") };
+export const metadata = { title: "المكتبة الكاملة", ...canonical("/arabic-books") };
 
 export default async function ArabicBooksPage({ searchParams }: Props) {
   const page = Math.max(1, parseInt(searchParams.page ?? "1"));

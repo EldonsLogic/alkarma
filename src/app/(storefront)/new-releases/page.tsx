@@ -16,7 +16,7 @@ interface Props {
 
 import { canonical } from "@/lib/seo";
 
-export const metadata = { title: "New Releases", ...canonical("/new-releases") };
+export const metadata = { title: "أحدث الإصدارات", ...canonical("/new-releases") };
 
 export default async function NewReleasesPage({ searchParams }: Props) {
   const page = Math.max(1, parseInt(searchParams.page ?? "1"));

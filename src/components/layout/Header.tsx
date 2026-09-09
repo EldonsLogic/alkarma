@@ -377,8 +377,11 @@ export function Header({ navCategories }: Props) {
                   ))}
                 </ul>
                 <div className="mx-7 my-[15px] border-t border-black" />
+                {/* Live sends this to /shop — the full catalogue — which this
+                    store's own 301 map rewrites to /arabic-books. NOT /category,
+                    which is the list of category names ("تصفّح التصنيفات"). */}
                 <h4 className="ps-7 text-[14px] font-bold leading-[24px] text-black py-[6px]">
-                  <Link href="/category" onClick={() => setHoveredMenu(null)} className="hover:text-brand transition-colors">
+                  <Link href="/arabic-books" onClick={() => setHoveredMenu(null)} className="hover:text-brand transition-colors">
                     تصفح كل الكتب
                   </Link>
                 </h4>
