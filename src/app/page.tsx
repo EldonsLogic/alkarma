@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { BookCarousel } from "@/components/storefront/BookCarousel";
 import { BRAND_AR } from "@/lib/brand";
+import { newReleaseWhere, NEW_RELEASE_ORDER_BY } from "@/lib/newReleases";
 import { CategoryGrid } from "@/components/storefront/CategoryGrid";
 import { HeroBanner } from "@/components/storefront/HeroBanner";
 import { CampaignBanner } from "@/components/storefront/CampaignBanner";
@@ -87,10 +88,13 @@ async function getHomeData() {
         take: RAIL_SIZE,
         select: BOOK_SUMMARY_SELECT,
       }),
-      // Same treatment: flagged new releases first, then the newest titles.
+      // Published this calendar year OR flagged by hand — see lib/newReleases.
+      // Ordered by publication date, not createdAt: createdAt is the import
+      // timestamp, so it would rank by whatever was written to the database
+      // last rather than by what is actually new.
       prisma.book.findMany({
-        where: { type: "BOOK", isActive: true },
-        orderBy: [{ isNewRelease: "desc" }, { createdAt: "desc" }],
+        where: { type: "BOOK", isActive: true, ...newReleaseWhere() },
+        orderBy: NEW_RELEASE_ORDER_BY,
         take: RAIL_SIZE,
         select: BOOK_SUMMARY_SELECT,
       }),

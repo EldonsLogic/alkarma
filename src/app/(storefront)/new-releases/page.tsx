@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { BOOK_SUMMARY_SELECT } from "@/lib/bookSummarySelect";
 import { resolveSortOrderBy } from "@/lib/sort";
+import { newReleaseWhere, NEW_RELEASE_ORDER_BY } from "@/lib/newReleases";
 import { CategoryPageClient } from "../category/[slug]/CategoryPageClient";
 
 interface Props {
@@ -23,12 +24,15 @@ export default async function NewReleasesPage({ searchParams }: Props) {
   const limit = 24;
   const skip = (page - 1) * limit;
 
-  const sort = searchParams.sort ?? "newest";
-  const orderBy = resolveSortOrderBy(sort);
+  // Default to publication order; an explicit ?sort= still wins.
+  const orderBy = searchParams.sort ? resolveSortOrderBy(searchParams.sort) : NEW_RELEASE_ORDER_BY;
 
   const where = {
     isActive: true,
-    isNewRelease: true,
+    // Published this calendar year OR flagged by hand. Previously this was the
+    // flag alone, so a book published this year never surfaced here unless
+    // somebody ticked it manually.
+    ...newReleaseWhere(),
     ...(searchParams.inStock === "true" ? { stock: { gt: 0 } } : {}),
     ...(searchParams.author ? { author: searchParams.author } : {}),
     ...(searchParams.minPrice || searchParams.maxPrice ? {
@@ -46,7 +50,7 @@ export default async function NewReleasesPage({ searchParams }: Props) {
 
   return (
     <CategoryPageClient
-      category={{ id: "new-releases", slug: "new-releases", name: "New Releases", nameAr: "إصدارات جديدة", imageUrl: null, sortOrder: 0, children: [], parent: null }}
+      category={{ id: "new-releases", slug: "new-releases", name: "أحدث الإصدارات", nameAr: "أحدث الإصدارات", imageUrl: null, sortOrder: 0, children: [], parent: null }}
       books={books.map((b) => ({
         id: b.id, slug: b.slug, title: b.title, titleAr: b.titleAr ?? null, author: b.author,
         authorSlug: b.authorRef?.slug ?? null,
