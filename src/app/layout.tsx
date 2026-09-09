@@ -90,12 +90,18 @@ async function getNavCategories() {
       "stationary",
     ]);
 
+    const visible = mapped.filter((c) => !NAV_LINKED_SLUGS.has(c.slug));
+
     const mothers = [
       {
         key: "categories",
         label: "التصنيفات",
         href: "/category",
-        groups: mapped.filter((c) => !NAV_LINKED_SLUGS.has(c.slug)),
+        // Live splits the panel: four columns of topics, then a fifth holding
+        // the imprints on their own. Publishers are therefore handed over
+        // separately rather than mixed into the topical flow.
+        groups: visible.filter((c) => c.kind !== "PUBLISHER"),
+        publishers: visible.filter((c) => c.kind === "PUBLISHER"),
       },
     ];
     return mothers.filter((m) => m.groups.length > 0);

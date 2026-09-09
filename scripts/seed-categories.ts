@@ -16,7 +16,10 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-type Cat = { slug: string; name: string; kind?: "BOOK" | "STATIONERY" };
+// "PUBLISHER" rows are imprints, not topics. Live lists them together in the
+// mega-menu's last column rather than mixed into the topical ones, and this
+// store links them at /publisher/<name> so they list books BY that imprint.
+type Cat = { slug: string; name: string; kind?: "BOOK" | "STATIONERY" | "PUBLISHER" };
 
 // Order roughly follows the live site's own sidebar listing.
 const CATEGORIES: Cat[] = [
@@ -35,14 +38,14 @@ const CATEGORIES: Cat[] = [
   { slug: "تعلم-الكتابة", name: "تعلم الكتابة" },
   { slug: "تلوين-للكبار", name: "تلوين للكبار" },
   { slug: "self-development", name: "تنمية ذاتية" },
-  { slug: "دار-الخيال", name: "دار الخيال" },
-  { slug: "دار-الكرمة", name: "دار الكرمة" },
-  { slug: "دار-جامعة-حمد-بن-خليفة-للنشر", name: "دار جامعة حمد بن خليفة للنشر" },
+  { slug: "دار-الخيال", name: "دار الخيال", kind: "PUBLISHER" },
+  { slug: "دار-الكرمة", name: "دار الكرمة", kind: "PUBLISHER" },
+  { slug: "دار-جامعة-حمد-بن-خليفة-للنشر", name: "دار جامعة حمد بن خليفة للنشر", kind: "PUBLISHER" },
   { slug: "روايات", name: "روايات" },
   { slug: "روايات-مترجمة", name: "روايات مترجمة" },
   { slug: "روحانيات", name: "روحانيات" },
   { slug: "سياسة-وعسكرية", name: "سياسة وعسكرية" },
-  { slug: "شركة-المطبوعات-للتوزيع-والنشر", name: "شركة المطبوعات للتوزيع والنشر" },
+  { slug: "شركة-المطبوعات-للتوزيع-والنشر", name: "شركة المطبوعات للتوزيع والنشر", kind: "PUBLISHER" },
   { slug: "شعر", name: "شعر" },
   { slug: "صحة", name: "صحة" },
   { slug: "cooking", name: "طبخ" },
@@ -56,11 +59,11 @@ const CATEGORIES: Cat[] = [
   { slug: "قواميس-ومعاجم-ومراجع", name: "قواميس ومعاجم ومراجع" },
   { slug: "award-winning-books", name: "كتب حاصلة على جوائز" },
   { slug: "كتب-للناشئة", name: "كتب للناشئة" },
-  { slug: "مجموعة-كلمات", name: "مجموعة كلمات" },
+  { slug: "مجموعة-كلمات", name: "مجموعة كلمات", kind: "PUBLISHER" },
   { slug: "مقالات", name: "مقالات" },
   { slug: "موسوعات", name: "موسوعات" },
   { slug: "نقد-أدبي", name: "نقد أدبي" },
-  { slug: "هاشيت-أنطوان", name: "هاشيت أنطوان" },
+  { slug: "هاشيت-أنطوان", name: "هاشيت أنطوان", kind: "PUBLISHER" },
 ];
 
 // NOT seeded: the live site still carries three English-titled legacy

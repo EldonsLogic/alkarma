@@ -22,7 +22,10 @@ export interface NavCategoryItem {
   key: string;
   label: string;
   href?: string;
+  /** Topical categories — fill the mega-menu's first four columns. */
   groups: NavGroup[];
+  /** Imprints — live gives these their own final column. */
+  publishers?: NavGroup[];
 }
 
 interface Props {
@@ -47,6 +50,23 @@ const NAV_AFTER_CATEGORIES = [
   { label: "أدوات مكتبية", href: "/category/stationary" },
   { label: "موزعينا", href: "/distributors" },
 ];
+
+/**
+ * Splits the topical categories into the four columns live uses, filling each
+ * column top-to-bottom before starting the next (column-major), which is the
+ * order live's own list reads in. Live happens to hold 7 per column; this
+ * balances instead so the panel stays even as the catalogue grows.
+ */
+function topicColumns(groups: NavGroup[]): NavGroup[][] {
+  const flat = groups.flatMap((g) => [g, ...g.subcategories.map((sub) => ({
+    name: sub.name,
+    nameAr: sub.nameAr,
+    slug: sub.slug,
+    subcategories: [] as SubCat[],
+  }))]);
+  const per = Math.ceil(flat.length / 4) || 1;
+  return [0, 1, 2, 3].map((i) => flat.slice(i * per, (i + 1) * per));
+}
 
 export function Header({ navCategories }: Props) {
   const { data: session } = useSession();
@@ -282,65 +302,88 @@ export function Header({ navCategories }: Props) {
         </div>
 
         {/* ── Mega-menu panel ─────────────────────────────────────
-            Geometry and type here were measured directly off the live site's
-            own panel, which sits in the DOM at all times behind
-            `visibility:hidden` and only fades in on hover. Measured values:
+            Measured directly off the live panel. It is fetched over AJAX into
+            an empty placeholder and then kept in the DOM behind
+            visibility:hidden, so `jQuery(li).trigger("mouseenter")` is what
+            loads it; once loaded its real geometry can be read exactly.
 
-              panel   864px wide, bg #FFF, border-top 1px #D0D0D0,
-                      radius 0 0 3px 3px, box-shadow: none, z-index 1000,
-                      anchored to the nav row's start edge (right, in RTL)
-              columns 5 equal columns of 172.8px, 30px vertical padding
-              links   Cairo 14px / line-height 28px / weight 400,
-                      colour #999999, no padding, right-aligned 28px in
+              panel    864px wide, white, border-top 1px #D0D0D0,
+                       radius 0 0 3px 3px, no shadow, z-index 1000
+              columns  5 equal 172.8px columns, 30px vertical padding.
+                       Columns 2 and 4 (0-indexed 1 and 3) are striped
+                       #F3F3F3; the rest are white.
+              links    Cairo 14px / 28px / weight 400, #999999,
+                       inset 28px from the start edge
+              column 5 imprints, then a 1px black rule inset 28px each side
+                       (15px of air above and below it), then "تصفح كل الكتب"
+                       as a bold black 14px/24px heading — NOT a plain link
 
-            Two deliberate deviations from live, both previously agreed:
-              • the live 5th column ends with an "English Books" category link;
-                /english-books was removed from this store on purpose.
-              • live's link hover resolves to #BCBCBC — lighter than the #999999
-                base. That is genuinely what the live CSS does (--tb-theme-color),
-                so it is reproduced rather than "corrected" to the brand red.
+            The first four columns are topics; the fifth is imprints. That
+            split is why this cannot be a CSS `column-count` flow: a flow
+            would scatter the imprints through the topical columns, and CSS
+            columns cannot be striped individually either.
 
-            Colours are written as literal hexes rather than theme tokens
-            because they are live-site values that do not correspond to any
-            token in this store's palette. */}
+            Deliberate deviations, both previously agreed: live's 4th column
+            ends with an English Books link (removed from this store on
+            purpose), and live's link hover resolves to #BCBCBC — lighter than
+            its own #999999 base. That is genuinely what live does, so it is
+            reproduced rather than "corrected".
+
+            Colours are literal hexes, not theme tokens: they are live-site
+            values with no counterpart in this store's palette. */}
         {activeMother && activeMother.groups.length > 0 && (
           <div
-            className="hidden lg:block absolute start-4 lg:start-10 w-[864px] max-w-[calc(100%-2rem)] lg:max-w-[calc(100%-5rem)] bg-white border-t border-[#D0D0D0] rounded-b-[3px] z-[102]"
+            className="hidden lg:block absolute start-4 lg:start-10 w-[864px] max-w-[calc(100%-2rem)] lg:max-w-[calc(100%-5rem)] bg-white border-t border-[#D0D0D0] rounded-b-[3px] z-[102] overflow-hidden"
             onMouseEnter={() => openMenu(activeMother.key)}
             onMouseLeave={scheduleClose}
           >
-            <ul className="[column-count:5] [column-gap:0] py-[30px]">
-              {[
-                ...activeMother.groups.flatMap((group) => [
-                  { slug: group.slug, label: loc(group.name, group.nameAr) },
-                  ...group.subcategories.map((sub) => ({
-                    slug: sub.slug,
-                    label: loc(sub.name, sub.nameAr),
-                  })),
-                ]),
-              ].map((c) => (
-                <li key={c.slug} className="break-inside-avoid">
-                  <Link
-                    href={`/category/${c.slug}`}
-                    onClick={() => setHoveredMenu(null)}
-                    className="block ps-7 text-[14px] font-normal leading-[28px] text-[#999999] hover:text-[#BCBCBC] transition-colors"
-                  >
-                    {c.label}
-                  </Link>
-                </li>
-              ))}
-              {/* Last item in the live panel's final column, styled identically
-                  to the category links — not a heading. */}
-              <li className="break-inside-avoid">
-                <Link
-                  href="/category"
-                  onClick={() => setHoveredMenu(null)}
-                  className="block ps-7 text-[14px] font-normal leading-[28px] text-[#999999] hover:text-[#BCBCBC] transition-colors"
+            <div className="flex items-stretch">
+              {topicColumns(activeMother.groups).map((column, i) => (
+                <div
+                  key={i}
+                  className={`w-1/5 py-[30px] ${i % 2 === 1 ? "bg-[#F3F3F3]" : ""}`}
                 >
-                  تصفح كل الكتب
-                </Link>
-              </li>
-            </ul>
+                  <ul>
+                    {column.map((c) => (
+                      <li key={c.slug}>
+                        <Link
+                          href={`/category/${c.slug}`}
+                          onClick={() => setHoveredMenu(null)}
+                          className="block ps-7 text-[14px] font-normal leading-[28px] text-[#999999] hover:text-[#BCBCBC] transition-colors"
+                        >
+                          {loc(c.name, c.nameAr)}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+
+              {/* Fifth column: imprints, rule, then the browse-all heading.
+                  Imprint links go to /publisher/<name>, which lists books by
+                  that publisher — not to a category page. */}
+              <div className="w-1/5 py-[30px]">
+                <ul>
+                  {(activeMother.publishers ?? []).map((p) => (
+                    <li key={p.slug}>
+                      <Link
+                        href={`/publisher/${encodeURIComponent(loc(p.name, p.nameAr))}`}
+                        onClick={() => setHoveredMenu(null)}
+                        className="block ps-7 text-[14px] font-normal leading-[28px] text-[#999999] hover:text-[#BCBCBC] transition-colors"
+                      >
+                        {loc(p.name, p.nameAr)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mx-7 my-[15px] border-t border-black" />
+                <h4 className="ps-7 text-[14px] font-bold leading-[24px] text-black py-[6px]">
+                  <Link href="/category" onClick={() => setHoveredMenu(null)} className="hover:text-brand transition-colors">
+                    تصفح كل الكتب
+                  </Link>
+                </h4>
+              </div>
+            </div>
           </div>
         )}
 
