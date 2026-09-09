@@ -78,8 +78,25 @@ async function getNavCategories() {
     // live site's header. Stationery has its own top-level nav link there, so
     // it is not given a second mother entry here — that produced a duplicate
     // "أدوات مكتبية" in the bar.
+    // The live site's mega-menu omits the categories that already have their
+    // own top-level nav link (أحدث الإصدارات / الأكثر مبيعًا / عروض وخصومات /
+    // أدوات مكتبية) — they are real categories there too, just not repeated
+    // inside the panel. كتب أطفال is deliberately NOT excluded: live lists it
+    // both in the bar and in the panel.
+    const NAV_LINKED_SLUGS = new Set([
+      "أحدث-الإصدارات",
+      "الأكثر-مبيعًا",
+      "عروض-وخصومات",
+      "stationary",
+    ]);
+
     const mothers = [
-      { key: "categories", label: "التصنيفات", href: "/category", groups: mapped },
+      {
+        key: "categories",
+        label: "التصنيفات",
+        href: "/category",
+        groups: mapped.filter((c) => !NAV_LINKED_SLUGS.has(c.slug)),
+      },
     ];
     return mothers.filter((m) => m.groups.length > 0);
   } catch {

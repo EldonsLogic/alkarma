@@ -70,8 +70,25 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
   const displayTitle = book.title;
   const discount = savingsPercent(book);
 
+  /*
+    Card width and the inner gutter are taken from the live site, measured at
+    four widths. Live sizes each item as a plain fraction of the row's content
+    box with NO flex gap — the visible gutter between covers is the card's own
+    horizontal padding, doubled. Reproducing it that way (rather than as a gap)
+    is what makes the cover come out at live's exact pixel size:
+
+      viewport   per row   item      padding   cover
+      375        2         172.5     15        142.5
+      768        3         242       26        190
+      1024       4         245.5     26        193.5
+      1280       5         231.6     30        171.6
+
+    These fall exactly on Tailwind's md/lg/xl breakpoints. The row must
+    therefore carry gap-0, and its content box must be min(vw - 30, 1170)
+    — see BookCarousel.
+    */
   return (
-    <Link href={`/book/${book.slug}`} className="group flex flex-col w-[143px] sm:w-[172px] flex-shrink-0 cursor-pointer">
+    <Link href={`/book/${book.slug}`} className="group flex flex-col flex-shrink-0 cursor-pointer w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-[15px] md:px-[26px] xl:px-[30px]">
       {/* Cover */}
       <div className="relative flex-shrink-0">
         {book.coverUrl ? (
@@ -80,12 +97,12 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
             alt={displayTitle}
             width={172}
             height={172}
-            sizes="(max-width: 640px) 143px, 172px"
+            sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 20vw"
             priority={priority}
-            className="book-cover-img w-[143px] h-[143px] sm:w-[172px] sm:h-[172px] object-contain block bg-paper"
+            className="book-cover-img w-full aspect-square object-contain block bg-paper"
           />
         ) : (
-          <div className="book-cover-img w-[143px] h-[143px] sm:w-[172px] sm:h-[172px] bg-paper-mid flex items-center justify-center p-3">
+          <div className="book-cover-img w-full aspect-square bg-paper-mid flex items-center justify-center p-3">
             <span className="text-[11px] text-ink-muted text-center leading-snug">{displayTitle}</span>
           </div>
         )}

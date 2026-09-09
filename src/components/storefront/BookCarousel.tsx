@@ -19,8 +19,17 @@ interface Props {
 export function BookCarousel({ title, overline, books, viewAllHref }: Props) {
   if (!books.length) return null;
 
+  /*
+    Live insets this panel 15px from each side of the viewport until it hits a
+    1170px cap, after which it centres — measured x=15/w=345 at 375, x=15/w=994
+    at 1024, x=55/w=1170 at 1280. calc keeps both behaviours in one rule.
+
+    No outer border: live draws this panel as plain white on the #F0F0F0 page
+    ground with no stroke. The border here was a mockup-ism, and it also stole
+    1px from every card width.
+  */
   return (
-    <section className="mx-4 sm:mx-10 my-5 bg-paper border border-paper-dark">
+    <section className="w-[calc(100%-30px)] max-w-[1170px] mx-auto my-5 bg-paper">
       <div className="flex items-center justify-between gap-4 px-5 sm:px-7 py-4 border-b border-paper-dark">
         <div className="min-w-0">
           {overline && <span className="section-overline">{overline}</span>}
@@ -38,7 +47,9 @@ export function BookCarousel({ title, overline, books, viewAllHref }: Props) {
         )}
       </div>
 
-      <div className="flex gap-5 overflow-x-auto px-5 sm:px-7 py-6 scrollbar-thin">
+      {/* gap-0 and no inline padding: the gutter is the cards' own padding, as
+          on live. Live's row padding is 0 on mobile and 6px from tablet up. */}
+      <div className="flex gap-0 overflow-x-auto px-0 md:px-[6px] py-6 scrollbar-thin">
         {books.map((book, i) => (
           <BookCard key={book.id} book={book} priority={i < 3} />
         ))}

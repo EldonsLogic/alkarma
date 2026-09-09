@@ -38,9 +38,13 @@ const NAV_BEFORE_CATEGORIES = [
   { label: "عروض وخصومات", href: "/bundles" },
 ];
 
+// Slugs here are the live site's own category slugs (verified against the
+// live header's hrefs). They previously pointed at /category/children and
+// /category/stationery, neither of which exists — both 404'd. "stationary"
+// is live's actual spelling, not a typo on our side.
 const NAV_AFTER_CATEGORIES = [
-  { label: "كتب أطفال", href: "/category/children" },
-  { label: "أدوات مكتبية", href: "/category/stationery" },
+  { label: "كتب أطفال", href: "/category/كتب-أطفال" },
+  { label: "أدوات مكتبية", href: "/category/stationary" },
   { label: "موزعينا", href: "/distributors" },
 ];
 
@@ -277,47 +281,66 @@ export function Header({ navCategories }: Props) {
           )}
         </div>
 
-        {/* ── Mega-menu panel ──────────────────────────────────────────────
-            Mirrors the live site: a single "تصفح كل الكتب" heading above a
-            flat five-column list of category links. It is deliberately NOT a
-            set of bold group headers with sub-lists — the live menu has one
-            heading and 33 plain links, and the heavier treatment was the main
-            reason this section didn't read like the real thing. */}
+        {/* ── Mega-menu panel ─────────────────────────────────────
+            Geometry and type here were measured directly off the live site's
+            own panel, which sits in the DOM at all times behind
+            `visibility:hidden` and only fades in on hover. Measured values:
+
+              panel   864px wide, bg #FFF, border-top 1px #D0D0D0,
+                      radius 0 0 3px 3px, box-shadow: none, z-index 1000,
+                      anchored to the nav row's start edge (right, in RTL)
+              columns 5 equal columns of 172.8px, 30px vertical padding
+              links   Cairo 14px / line-height 28px / weight 400,
+                      colour #999999, no padding, right-aligned 28px in
+
+            Two deliberate deviations from live, both previously agreed:
+              • the live 5th column ends with an "English Books" category link;
+                /english-books was removed from this store on purpose.
+              • live's link hover resolves to #BCBCBC — lighter than the #999999
+                base. That is genuinely what the live CSS does (--tb-theme-color),
+                so it is reproduced rather than "corrected" to the brand red.
+
+            Colours are written as literal hexes rather than theme tokens
+            because they are live-site values that do not correspond to any
+            token in this store's palette. */}
         {activeMother && activeMother.groups.length > 0 && (
           <div
-            className="hidden lg:block absolute start-0 end-0 bg-paper shadow-[0_8px_32px_rgba(0,0,0,0.14)] z-[102] border-t border-paper-dark"
+            className="hidden lg:block absolute start-4 lg:start-10 w-[864px] max-w-[calc(100%-2rem)] lg:max-w-[calc(100%-5rem)] bg-white border-t border-[#D0D0D0] rounded-b-[3px] z-[102]"
             onMouseEnter={() => openMenu(activeMother.key)}
             onMouseLeave={scheduleClose}
           >
-            <div className="px-4 lg:px-10 py-7">
-              <Link
-                href="/category"
-                onClick={() => setHoveredMenu(null)}
-                className="inline-block font-display text-[20px] font-bold text-brand mb-5 hover:text-brand-dark transition-colors"
-              >
-                تصفح كل الكتب
-              </Link>
-              {/* CSS columns so links flow down each column, as on the live site */}
-              <ul className="[column-count:2] md:[column-count:3] lg:[column-count:5] [column-gap:2rem]">
-                {activeMother.groups.flatMap((group) => [
+            <ul className="[column-count:5] [column-gap:0] py-[30px]">
+              {[
+                ...activeMother.groups.flatMap((group) => [
                   { slug: group.slug, label: loc(group.name, group.nameAr) },
                   ...group.subcategories.map((sub) => ({
                     slug: sub.slug,
                     label: loc(sub.name, sub.nameAr),
                   })),
-                ]).map((c) => (
-                  <li key={c.slug} className="break-inside-avoid">
-                    <Link
-                      href={`/category/${c.slug}`}
-                      onClick={() => setHoveredMenu(null)}
-                      className="block py-[5px] text-[14px] text-ink hover:text-brand transition-colors"
-                    >
-                      {c.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                ]),
+              ].map((c) => (
+                <li key={c.slug} className="break-inside-avoid">
+                  <Link
+                    href={`/category/${c.slug}`}
+                    onClick={() => setHoveredMenu(null)}
+                    className="block ps-7 text-[14px] font-normal leading-[28px] text-[#999999] hover:text-[#BCBCBC] transition-colors"
+                  >
+                    {c.label}
+                  </Link>
+                </li>
+              ))}
+              {/* Last item in the live panel's final column, styled identically
+                  to the category links — not a heading. */}
+              <li className="break-inside-avoid">
+                <Link
+                  href="/category"
+                  onClick={() => setHoveredMenu(null)}
+                  className="block ps-7 text-[14px] font-normal leading-[28px] text-[#999999] hover:text-[#BCBCBC] transition-colors"
+                >
+                  تصفح كل الكتب
+                </Link>
+              </li>
+            </ul>
           </div>
         )}
 
