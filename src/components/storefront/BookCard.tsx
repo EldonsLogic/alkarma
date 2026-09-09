@@ -20,10 +20,12 @@ interface Props {
 const BYLINE = "تأليف: ";
 
 /**
- * Live never reveals the add-to-cart control on its product tiles — see the
- * note at the button below. Flip to true to restore it everywhere at once.
+ * Live shows the tile's add-to-cart BELOW 768px and hides it at 768 and above
+ * — verified at 375/480/576 (static, visible) against 768/1024/1280 (absolute,
+ * visibility:hidden). It never reveals on hover at any width. Set this to true
+ * to show it on desktop too, deviating from live on purpose.
  */
-const SHOW_GRID_ADD_TO_CART = false;
+const SHOW_DESKTOP_GRID_ADD_TO_CART = false;
 
 export function BookCard({ book, showAddToCart = true, priority = false }: Props) {
 
@@ -97,7 +99,13 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
     — see BookCarousel.
     */
   return (
-    <Link href={`/book/${book.slug}`} className="group flex flex-col flex-shrink-0 cursor-pointer w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-[15px] md:px-[26px] xl:px-[30px]">
+    <Link href={`/book/${book.slug}`} className="group flex flex-col flex-shrink-0 cursor-pointer w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-[15px] md:px-[26px] xl:px-[30px] pt-[20px] xl:pt-[30px] pb-[20px] xl:pb-[61px]">
+      {/* Live keeps an empty 21px "product-top" row above the cover with 10px
+          beneath it. It is empty on all 60 of its homepage tiles — no badges
+          anywhere — so it is pure spacing, and reproduced as such. This card's
+          own badges stay overlaid on the cover, where they cost no height. */}
+      <div aria-hidden className="h-[26px] xl:h-[21px] mb-[10px]" />
+
       {/* Cover */}
       <div className="relative flex-shrink-0">
         {book.coverUrl ? (
@@ -165,14 +173,17 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
       </div>
 
       {/* Info */}
-      <div className="pt-[10px] pb-1 flex flex-col flex-1">
+      {/* Caption. Live: 25px above the title, a 60px title+byline block at
+          line-height 20 (two title lines + one byline line), then the price
+          with 5px beneath it. */}
+      <div className="pt-[17px] xl:pt-[25px] flex flex-col">
         {/* Live's grid title is 16.8px bold, not 14px regular — measured on its
             own product tiles at 1280. Two lines, then the byline. */}
-        <p dir="auto" className="font-display text-[16.8px] font-bold text-ink leading-snug line-clamp-2 mb-[3px] h-[48px] overflow-hidden">
+        <p dir="auto" className="font-display text-[16.8px] font-bold text-ink leading-[20px] line-clamp-2 overflow-hidden">
           {displayTitle}
         </p>
         {book.authors && book.authors.length > 0 ? (
-          <p dir="auto" className="text-[14px] text-ink mb-[5px] line-clamp-1">
+          <p dir="auto" className="text-[14px] text-ink leading-[20px] h-[20px] mb-[5px] xl:mb-0 line-clamp-1">
             {BYLINE}
             {book.authors.map((a, i) => (
               <span key={a.slug}>
@@ -192,17 +203,18 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
             href={`/author/${book.authorSlug}`}
             onClick={(e) => e.stopPropagation()}
             dir="auto"
-            className="text-[14px] text-ink hover:text-brand transition-colors mb-[5px] line-clamp-1 block"
+            className="text-[14px] text-ink leading-[20px] h-[20px] mb-[5px] xl:mb-0 hover:text-brand transition-colors line-clamp-1 block"
           >
             {BYLINE}{book.author}
           </Link>
         ) : (
-          <p dir="auto" className="text-[14px] text-ink mb-[5px] line-clamp-1">{BYLINE}{book.author}</p>
+          <p dir="auto" className="text-[14px] text-ink leading-[20px] h-[20px] mb-[5px] xl:mb-0 line-clamp-1">{BYLINE}{book.author}</p>
         )}
         {book.averageRating !== undefined && book.reviewCount !== undefined && (
           <StarRating rating={book.averageRating} count={book.reviewCount} />
         )}
-        <PriceDisplay item={book} size="sm" className="mt-1" />
+        {/* Live's price line measures 21.5px tall with 5px beneath it. */}
+        <PriceDisplay item={book} size="sm" className="mb-[5px] leading-[21.5px]" />
       </div>
 
       {/* Card action.
@@ -215,12 +227,17 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
           "tbay-body-woocommerce-catalog-mod" class, so this reads as a
           deliberate catalogue mode rather than an accident.
 
-          Matched by default. Note live still RESERVES the button's 35px of
-          layout space, which is why hiding it here changes no tile heights.
-          Set SHOW_GRID_ADD_TO_CART to true to put the control back — it is a
-          real conversion affordance, just not one the live site uses. */}
-      {SHOW_GRID_ADD_TO_CART && showAddToCart && (
-        <div className="mt-auto pt-2 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
+          But that is only true from 768px up. BELOW 768 live's .group-buttons
+          flips to position:static, visibility:visible, 38px tall and sits in
+          the layout — confirmed at 375, 480 and 576. So live hides the control
+          on desktop and shows it on touch, and this card now does the same via
+          md:hidden. It never reveals on hover at any width, so the old
+          hover-reveal has gone.
+
+          Above 768 the control is absolutely positioned over the cover on
+          live, costing no layout height — there is nothing to reserve for it. */}
+      {showAddToCart && (
+        <div className={`mt-auto pt-2 ${SHOW_DESKTOP_GRID_ADD_TO_CART ? "" : "md:hidden"}`}>
           <button
             onClick={handleAddToCart}
             className="w-full py-[7px] bg-[#BCBCBC] hover:bg-[#a9a9a9] text-white text-[13px] font-bold rounded-[3px] transition-colors"
@@ -231,9 +248,6 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
         </div>
       )}
 
-      {/* Live leaves the hidden control's 35px of space in the tile. Kept so
-          tiles keep a consistent height and match live's proportions. */}
-      {!SHOW_GRID_ADD_TO_CART && showAddToCart && <div aria-hidden className="mt-auto pt-2 h-[35px]" />}
     </Link>
   );
 }
