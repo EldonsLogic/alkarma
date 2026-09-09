@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { PromoBar } from "./PromoBar";
 import { CartIcon } from "./CartIcon";
 import { BRAND_SHORT_AR, BRAND_AR } from "@/lib/brand";
@@ -77,6 +77,7 @@ export function Header({ navCategories }: Props) {
   const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -129,7 +130,10 @@ export function Header({ navCategories }: Props) {
         <PromoBar />
 
         {/* ── Top bar: logo / search / icons ── */}
-        <nav className="bg-paper border-b border-paper-dark px-4 md:px-10 flex items-center gap-3 md:gap-6 h-[60px] md:h-[72px] sticky top-0 z-[101] shadow-[0_1px_4px_rgba(26,18,8,0.07)]">
+        {/* Live's masthead sits on #F4F4F4, a shade off the white nav bar
+            below it — measured on the live header. bg-paper (white) made the
+            two bars read as one slab. */}
+        <nav className="bg-[#F4F4F4] border-b border-paper-dark px-4 md:px-10 flex items-center gap-3 md:gap-6 h-[60px] md:h-[72px] sticky top-0 z-[101] shadow-[0_1px_4px_rgba(26,18,8,0.07)]">
 
           {/* Hamburger */}
           <button
@@ -243,7 +247,10 @@ export function Header({ navCategories }: Props) {
             <Link
               key={link.href}
               href={link.href}
-              className="px-5 py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 border-transparent text-ink hover:text-brand hover:border-brand transition-all"
+              // Live paints the current page's nav item brand red.
+              className={`px-5 py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 border-transparent transition-all hover:text-brand hover:border-brand ${
+                pathname === link.href ? "text-brand" : "text-ink"
+              }`}
             >
               {link.label}
             </Link>
@@ -288,7 +295,10 @@ export function Header({ navCategories }: Props) {
             <Link
               key={link.href}
               href={link.href}
-              className="px-5 py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 border-transparent text-ink hover:text-brand hover:border-brand transition-all"
+              // Live paints the current page's nav item brand red.
+              className={`px-5 py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 border-transparent transition-all hover:text-brand hover:border-brand ${
+                pathname === link.href ? "text-brand" : "text-ink"
+              }`}
             >
               {link.label}
             </Link>
