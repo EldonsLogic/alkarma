@@ -56,6 +56,14 @@ async function getNewsletterContent() {
  */
 const RAIL_SIZE = 15;
 
+/**
+ * Staff picks, featured authors, adopt-a-book, book of the month, the category
+ * grid and bundles have no counterpart on the live homepage, so they are not
+ * rendered here. The features themselves are untouched and still live at their
+ * own routes — this only controls whether the homepage shows them.
+ */
+const SHOW_NON_LIVE_HOME_SECTIONS = false;
+
 async function getHomeData() {
   const [banners, bestsellers, newReleases, imprintPicks, offers, staffPickList, categories, bundles, botmList, adoptList, featuredAuthors] =
     await Promise.all([
@@ -317,33 +325,39 @@ export default async function HomePage() {
         </Reveal>
       )}
 
-      {/* ── Sections below have no counterpart on the live homepage ──────
-          Kept, but moved beneath the live-matching content rather than
-          deleted: each is a real feature of this store with its own route.
-          Flagged for a decision on whether the homepage should carry them. */}
+      {/* ── Sections the live homepage does not have ─────────────────────
+          Switched off so this homepage matches the live site as-is. Nothing
+          is deleted: every one of these is a working feature with its own
+          route, its own admin screen and its own data, all still reachable —
+          only the homepage rendering is gated. Flip the flag to bring them
+          back. The queries that feed them still run in getHomeData(), so
+          re-enabling is a one-line change with nothing else to rewire. */}
+      {SHOW_NON_LIVE_HOME_SECTIONS && (
+        <>
+          {staffPicks.length > 0 && (
+            <Reveal>
+              <BookCarousel
+                title="اختيارات الفريق"
+                books={staffPicks}
+              />
+            </Reveal>
+          )}
 
-      {staffPicks.length > 0 && (
-        <Reveal>
-          <BookCarousel
-            title="اختيارات الفريق"
-            books={staffPicks}
-          />
-        </Reveal>
+          <Reveal><FeaturedAuthors authors={featuredAuthors} /></Reveal>
+
+          {/* Adopt a Book — second-hand / slightly damaged copies */}
+          {adopt.length > 0 && <Reveal><AdoptSection books={adopt} /></Reveal>}
+
+          {/* Book of the Month — hidden entirely when no pick is set */}
+          {bookOfMonth && <Reveal><BookOfMonth book={bookOfMonth} /></Reveal>}
+
+          {/* Browse Categories — tiles cascade in (internal stagger) */}
+          <CategoryGrid categories={categories} title="تصفّح حسب التصنيف" />
+
+          {/* Featured Bundles */}
+          {bundles.length > 0 && <Reveal><BundleRow bundles={bundles} /></Reveal>}
+        </>
       )}
-
-      {/* Adopt a Book — second-hand / slightly damaged copies; hidden when empty */}
-      <Reveal><FeaturedAuthors authors={featuredAuthors} /></Reveal>
-
-      {adopt.length > 0 && <Reveal><AdoptSection books={adopt} /></Reveal>}
-
-      {/* Book of the Month — hidden entirely when no pick is set */}
-      {bookOfMonth && <Reveal><BookOfMonth book={bookOfMonth} /></Reveal>}
-
-      {/* Browse Categories — tiles cascade in (internal stagger) */}
-      <CategoryGrid categories={categories} title="تصفّح حسب التصنيف" />
-
-      {/* Featured Bundles */}
-      {bundles.length > 0 && <Reveal><BundleRow bundles={bundles} /></Reveal>}
 
       {/* Newsletter */}
       <Reveal><NewsletterStrip content={newsletter} /></Reveal>

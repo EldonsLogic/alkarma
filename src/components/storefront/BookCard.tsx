@@ -19,6 +19,12 @@ interface Props {
 /** Live prefixes the byline on its product tiles, e.g. "تأليف: ميرنا المهدي". */
 const BYLINE = "تأليف: ";
 
+/**
+ * Live never reveals the add-to-cart control on its product tiles — see the
+ * note at the button below. Flip to true to restore it everywhere at once.
+ */
+const SHOW_GRID_ADD_TO_CART = false;
+
 export function BookCard({ book, showAddToCart = true, priority = false }: Props) {
 
   const [added, setAdded] = useState(false);
@@ -199,10 +205,21 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
         <PriceDisplay item={book} size="sm" className="mt-1" />
       </div>
 
-      {/* Card action — the live site shows a SINGLE grey "add to cart" button
-          (no buy-now on the card), revealed on hover at desktop and always
-          visible on touch, where there is no hover. */}
-      {showAddToCart && (
+      {/* Card action.
+          Verified against the live site with a REAL pointer hover (a
+          JS-dispatched mouseenter cannot fire CSS :hover, so it proves
+          nothing here): live's tile button never appears. Its .group-buttons
+          wrapper computes visibility:hidden / opacity:0 both at rest AND while
+          .product-block:hover is genuinely true, and all 60 tiles on the
+          homepage report hidden/0. Live's stylesheet carries a
+          "tbay-body-woocommerce-catalog-mod" class, so this reads as a
+          deliberate catalogue mode rather than an accident.
+
+          Matched by default. Note live still RESERVES the button's 35px of
+          layout space, which is why hiding it here changes no tile heights.
+          Set SHOW_GRID_ADD_TO_CART to true to put the control back — it is a
+          real conversion affordance, just not one the live site uses. */}
+      {SHOW_GRID_ADD_TO_CART && showAddToCart && (
         <div className="mt-auto pt-2 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
           <button
             onClick={handleAddToCart}
@@ -213,6 +230,10 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
           </button>
         </div>
       )}
+
+      {/* Live leaves the hidden control's 35px of space in the tile. Kept so
+          tiles keep a consistent height and match live's proportions. */}
+      {!SHOW_GRID_ADD_TO_CART && showAddToCart && <div aria-hidden className="mt-auto pt-2 h-[35px]" />}
     </Link>
   );
 }
