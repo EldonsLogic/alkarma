@@ -162,7 +162,7 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
           className={`absolute top-2 end-2 w-7 h-7 flex items-center justify-center bg-paper/85 backdrop-blur-sm transition-all duration-150 focus:opacity-100 ${
             wishlisted
               ? "opacity-100"
-              : "opacity-0 group-hover:opacity-100"
+              : "opacity-100"
           }`}
         >
           <svg

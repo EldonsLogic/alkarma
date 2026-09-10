@@ -467,7 +467,7 @@ function ProductCard({ book }: { book: BookSummary; }) {
           disabled={wishlistLoading}
           aria-label={wishlisted ? t.removeFromWishlist : t.addToWishlist}
           className={`absolute top-2 end-2 w-7 h-7 flex items-center justify-center bg-paper/85 backdrop-blur-sm transition-all duration-150 focus:opacity-100 ${
-            wishlisted ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+            wishlisted ? "opacity-100" : "opacity-100"
           }`}
         >
           <svg
@@ -504,7 +504,15 @@ function ProductCard({ book }: { book: BookSummary; }) {
         <div className="mt-auto pt-2 flex flex-col gap-0">
           <button
             onClick={handleBuyNow}
-            className="w-full py-2 bg-ink hover:bg-ink/80 text-paper text-[11px] sm:text-[12px] font-bold uppercase tracking-wide rounded-t-sm transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 -translate-y-1 group-hover:translate-y-0 duration-150"
+            /* Always visible — no hover reveal.
+               This was opacity-0 with a group-hover reveal, which made the
+               button unreachable on touch (no hover at all) AND, as it turned
+               out, on desktop too: the reveal did not fire even with
+               .group:hover genuinely matching. A control that cannot be
+               clicked on either platform is worse than one that is simply
+               shown, and hiding a primary buy action behind a hover was poor
+               for discoverability regardless. */
+            className="w-full py-2 bg-ink hover:bg-ink/80 text-paper text-[11px] sm:text-[12px] font-bold uppercase tracking-wide rounded-t-sm transition-colors duration-150"
           >
             {t.buyNow}
           </button>
