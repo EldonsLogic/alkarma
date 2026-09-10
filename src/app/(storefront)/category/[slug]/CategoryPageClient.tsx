@@ -467,7 +467,7 @@ function ProductCard({ book }: { book: BookSummary; }) {
           disabled={wishlistLoading}
           aria-label={wishlisted ? t.removeFromWishlist : t.addToWishlist}
           className={`absolute top-2 end-2 w-7 h-7 flex items-center justify-center bg-paper/85 backdrop-blur-sm transition-all duration-150 focus:opacity-100 ${
-            wishlisted ? "opacity-100" : "opacity-100"
+            wishlisted ? "opacity-100" : "sm:opacity-0 sm:group-hover:opacity-100"
           }`}
         >
           <svg
@@ -501,18 +501,16 @@ function ProductCard({ book }: { book: BookSummary; }) {
             .join("، ")}
         </p>
         <PriceDisplay item={book} size="sm" />
-        <div className="mt-auto pt-2 flex flex-col gap-0">
+        {/* Same wrapper-level reveal as BookCard, ported from Jee: visible by
+            default (so touch always has it), hidden from sm up, restored on
+            hover. Putting the opacity on the shared wrapper rather than on each
+            button is what makes it work — the per-button variants tried here
+            previously lost in the cascade and left the controls unclickable on
+            BOTH platforms. */}
+        <div className="mt-auto pt-2 flex flex-col gap-0 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
           <button
             onClick={handleBuyNow}
-            /* Always visible — no hover reveal.
-               This was opacity-0 with a group-hover reveal, which made the
-               button unreachable on touch (no hover at all) AND, as it turned
-               out, on desktop too: the reveal did not fire even with
-               .group:hover genuinely matching. A control that cannot be
-               clicked on either platform is worse than one that is simply
-               shown, and hiding a primary buy action behind a hover was poor
-               for discoverability regardless. */
-            className="w-full py-2 bg-ink hover:bg-ink/80 text-paper text-[11px] sm:text-[12px] font-bold uppercase tracking-wide rounded-t-sm transition-colors duration-150"
+            className="w-full py-2 bg-ink hover:bg-ink/80 text-paper text-[11px] sm:text-[12px] font-bold uppercase tracking-wide rounded-t-sm transition-colors"
           >
             {t.buyNow}
           </button>

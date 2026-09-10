@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
@@ -19,17 +20,10 @@ interface Props {
 /** Live prefixes the byline on its product tiles, e.g. "تأليف: ميرنا المهدي". */
 const BYLINE = "تأليف: ";
 
-/**
- * Live shows the tile's add-to-cart BELOW 768px and hides it at 768 and above
- * — verified at 375/480/576 (static, visible) against 768/1024/1280 (absolute,
- * visibility:hidden). It never reveals on hover at any width. Set this to true
- * to show it on desktop too, deviating from live on purpose.
- */
-const SHOW_DESKTOP_GRID_ADD_TO_CART = false;
-
 export function BookCard({ book, showAddToCart = true, priority = false }: Props) {
 
   const [added, setAdded] = useState(false);
+  const router = useRouter();
   const [wishlisted, setWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const { addItem, openDrawer } = useCartStore();
@@ -51,6 +45,12 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
     setAdded(true);
     openDrawer();
     setTimeout(() => setAdded(false), 2000);
+  }
+
+  function handleBuyNow(e: React.MouseEvent) {
+    e.preventDefault();
+    addItem(cartPayload);
+    router.push("/cart");
   }
 
   async function handleWishlist(e: React.MouseEvent) {
@@ -162,7 +162,7 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
           className={`absolute top-2 end-2 w-7 h-7 flex items-center justify-center bg-paper/85 backdrop-blur-sm transition-all duration-150 focus:opacity-100 ${
             wishlisted
               ? "opacity-100"
-              : "opacity-100"
+              : "sm:opacity-0 sm:group-hover:opacity-100"
           }`}
         >
           <svg
@@ -213,30 +213,31 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
         <PriceDisplay item={book} size="sm" className="mb-[5px] leading-[21.5px]" />
       </div>
 
-      {/* Card action.
-          Verified against the live site with a REAL pointer hover (a
-          JS-dispatched mouseenter cannot fire CSS :hover, so it proves
-          nothing here): live's tile button never appears. Its .group-buttons
-          wrapper computes visibility:hidden / opacity:0 both at rest AND while
-          .product-block:hover is genuinely true, and all 60 tiles on the
-          homepage report hidden/0. Live's stylesheet carries a
-          "tbay-body-woocommerce-catalog-mod" class, so this reads as a
-          deliberate catalogue mode rather than an accident.
+      {/* Buy Now + Add to Cart — ported verbatim from Jee, where this works on
+          both platforms.
 
-          But that is only true from 768px up. BELOW 768 live's .group-buttons
-          flips to position:static, visibility:visible, 38px tall and sits in
-          the layout — confirmed at 375, 480 and 576. So live hides the control
-          on desktop and shows it on touch, and this card now does the same via
-          md:hidden. It never reveals on hover at any width, so the old
-          hover-reveal has gone.
+          The reveal lives on the WRAPPER, not on each button, and the base
+          state is visible: no opacity utility applies below sm, so the pair is
+          always on for touch; sm:opacity-0 hides it from 640px up and
+          sm:group-hover:opacity-100 brings it back on hover. One opacity
+          property on one element means nothing competes in the cascade — which
+          is what defeated the earlier per-button attempts here.
 
-          Above 768 the control is absolutely positioned over the cover on
-          live, costing no layout height — there is nothing to reserve for it. */}
+          This supersedes the earlier catalogue-mode treatment (md:hidden, no
+          buy-now), which matched live but left desktop cards with no controls
+          at all. */}
       {showAddToCart && (
-        <div className={`mt-auto pt-2 ${SHOW_DESKTOP_GRID_ADD_TO_CART ? "" : "md:hidden"}`}>
+        <div className="mt-auto pt-2 flex flex-col sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
+          <button
+            onClick={handleBuyNow}
+            className="w-full py-[7px] bg-ink hover:bg-ink/80 text-white text-[13px] font-bold rounded-t-[3px] transition-colors"
+            aria-label={`اشترِ ${displayTitle} الآن`}
+          >
+            اشترِ الآن
+          </button>
           <button
             onClick={handleAddToCart}
-            className="w-full py-[7px] bg-[#BCBCBC] hover:bg-[#a9a9a9] text-white text-[13px] font-bold rounded-[3px] transition-colors"
+            className="w-full py-[7px] bg-brand hover:bg-brand-dark text-white text-[13px] font-bold rounded-b-[3px] transition-colors"
             aria-label={`أضف ${displayTitle} إلى السلة`}
           >
             {added ? "تمت الإضافة ✓" : "إضافة إلى السلة"}
