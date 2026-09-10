@@ -7,6 +7,7 @@ import { useCartStore } from "@/stores/cart.store";
 import { useShipsToEgypt } from "@/hooks/use-ships-to-egypt";
 import { formatPrice, getPrice } from "@/lib/currency";
 import { gtmBeginCheckout } from "@/lib/gtm";
+import { coverSrc } from "@/lib/coverSrc";
 
 const STRINGS = {
     items: (n: number) => `${n} ${n === 1 ? "منتج" : "منتجات"}`,
@@ -133,7 +134,7 @@ export default function CartPage() {
                       <div className="w-[80px] sm:w-[90px] h-[120px] sm:h-[135px] overflow-hidden">
                         {item.coverUrl ? (
                           <Image
-                            src={item.coverUrl}
+                            src={coverSrc(item.coverUrl)}
                             alt={item.title}
                             width={90}
                             height={135}

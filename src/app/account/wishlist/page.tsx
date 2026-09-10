@@ -3,6 +3,7 @@ import Image from "next/image";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { coverSrc } from "@/lib/coverSrc";
 
 export const metadata = { title: "My Wishlist" };
 
@@ -83,7 +84,7 @@ export default async function WishlistPage() {
               <Link href={`/book/${book.slug}`} className="flex-shrink-0">
                 {book.coverUrl && !false ? (
                   <Image
-                    src={book.coverUrl}
+                    src={coverSrc(book.coverUrl)}
                     alt={book.title}
                     width={72}
                     height={108}

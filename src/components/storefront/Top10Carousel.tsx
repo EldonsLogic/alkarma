@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { BookSummary } from "@/types";
+import { coverSrc } from "@/lib/coverSrc";
 
 interface Props {
   books: BookSummary[];
@@ -76,7 +77,7 @@ export function Top10Carousel({ books }: Props) {
                 >
                   {hasImage ? (
                     <Image
-                      src={book.coverUrl}
+                      src={coverSrc(book.coverUrl)}
                       alt={displayTitle}
                       width={100}
                       height={150}

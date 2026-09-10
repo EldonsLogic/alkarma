@@ -12,6 +12,7 @@ import { effectivePrices } from "@/lib/currency";
 import type { BookSummary, CategorySummary } from "@/types";
 import { Pagination } from "@/components/storefront/Pagination";
 import { RecentlyViewed } from "@/components/storefront/RecentlyViewed";
+import { coverSrc } from "@/lib/coverSrc";
 
 interface CategoryData extends CategorySummary {
   children: CategorySummary[];
@@ -449,7 +450,7 @@ function ProductCard({ book }: { book: BookSummary; }) {
             // whole. The frame paints no background and casts no shadow — a
             // white box around a letterboxed cover was what made the mismatch
             // obvious; with nothing behind it the cover sits straight on the page.
-            <Image src={book.coverUrl} alt={book.title} fill className="cover-img object-contain" />
+            <Image src={coverSrc(book.coverUrl)} alt={book.title} fill className="object-contain" />
           ) : (
             <div className="w-full h-full flex items-center justify-center p-3">
               <span className="text-[10px] sm:text-[11px] text-ink-muted text-center leading-snug">{book.title}</span>

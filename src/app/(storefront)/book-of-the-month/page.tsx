@@ -4,6 +4,7 @@ import Image from "next/image";
 import { BookCarousel } from "@/components/storefront/BookCarousel";
 import type { Metadata } from "next";
 import { canonical } from "@/lib/seo";
+import { coverSrc } from "@/lib/coverSrc";
 
 // Summary fields plus synopsis (needed for the main pick's blurb) — still
 // excludes subtitle/publisher/translator/editor/publishDate/pageCount/etc.
@@ -192,7 +193,7 @@ export default async function BookOfTheMonthPage() {
                   <div className="relative w-full aspect-[2/3]">
                     {book.coverUrl ? (
                       <Image
-                        src={book.coverUrl}
+                        src={coverSrc(book.coverUrl)}
                         alt={book.title}
                         fill
                         className="object-cover group-hover:opacity-80 transition-opacity"

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { coverSrc } from "@/lib/coverSrc";
 
 export interface BookOfMonthData {
   slug: string;
@@ -54,7 +55,7 @@ export function BookOfMonth({ book }: { book: BookOfMonthData; }) {
             <Link href={`/book/${book.slug}`} className="block group w-[170px] sm:w-[200px]">
               <div className="relative w-full aspect-[2/3]">
                 {book.coverUrl ? (
-                  <Image src={book.coverUrl} alt={title} fill sizes="200px" className="object-cover" />
+                  <Image src={coverSrc(book.coverUrl)} alt={title} fill sizes="200px" className="object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-ink-muted text-[13px] px-3 text-center">
                     {title}

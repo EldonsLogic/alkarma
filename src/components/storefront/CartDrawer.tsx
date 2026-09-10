@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useCartStore } from "@/stores/cart.store";
 import { formatPrice, getPrice } from "@/lib/currency";
 import { gtmViewCart } from "@/lib/gtm";
+import { coverSrc } from "@/lib/coverSrc";
 
 export function CartDrawer() {
   const { items, isOpen, closeDrawer, removeItem, updateQty, subtotal } = useCartStore();
@@ -98,7 +99,7 @@ export function CartDrawer() {
                   <div className="flex-shrink-0 w-16 h-24 bg-paper-mid shadow-sm overflow-hidden">
                     {item.coverUrl ? (
                       <Image
-                        src={item.coverUrl}
+                        src={coverSrc(item.coverUrl)}
                         alt={item.title}
                         width={64}
                         height={96}

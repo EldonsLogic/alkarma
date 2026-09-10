@@ -10,6 +10,7 @@ import { StarRating } from "./StarRating";
 import { useCartStore } from "@/stores/cart.store";
 import { effectivePrices, savingsPercent } from "@/lib/currency";
 import type { BookSummary } from "@/types";
+import { coverSrc } from "@/lib/coverSrc";
 
 interface Props {
   book: BookSummary;
@@ -119,7 +120,7 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
       <div className="relative flex-shrink-0">
         {book.coverUrl ? (
           <Image
-            src={book.coverUrl}
+            src={coverSrc(book.coverUrl)}
             alt={displayTitle}
             width={172}
             height={172}
