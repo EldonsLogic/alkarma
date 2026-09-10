@@ -120,7 +120,7 @@ export async function Footer() {
           href={item.href}
           target={item.openNew ? "_blank" : undefined}
           rel={item.openNew ? "noopener noreferrer" : undefined}
-          className="block text-[13px] text-paper-dark/70 mb-2 hover:text-brand transition-colors"
+          className="block text-[13px] text-white mb-2 hover:text-brand transition-colors"
         >
           {item.labelAr ? item.labelAr : item.label}
         </Link>
@@ -130,7 +130,7 @@ export async function Footer() {
       <Link
         key={item.href}
         href={item.href}
-        className="block text-[13px] text-paper-dark/70 mb-2 hover:text-brand transition-colors"
+        className="block text-[13px] text-white mb-2 hover:text-brand transition-colors"
       >
         {item.labelAr}
       </Link>
@@ -146,7 +146,7 @@ export async function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* About */}
           <div>
-            <div className="mb-3 opacity-70">
+            <div className="mb-3">
               <Image
                 src="/logo-footer.png"
                 alt={BRAND_SHORT_AR}
@@ -155,7 +155,7 @@ export async function Footer() {
                 className="h-[125px] w-auto"
               />
             </div>
-            <p className="text-[13px] text-paper-dark/70 leading-relaxed">{tagline}</p>
+            <p className="text-[13px] text-white leading-relaxed">{tagline}</p>
           </div>
 
           {/* Shop column */}

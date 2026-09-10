@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BookCard } from "./BookCard";
+import { Reveal } from "@/components/ui/Reveal";
 import type { BookSummary } from "@/types";
 
 interface Props {
@@ -47,7 +48,12 @@ export function BookCarousel({ title, overline, books, viewAllHref, variant = "s
 
       {/* gap-0 and no inline padding: the gutter is the cards' own padding, as
           on live. Live's row padding is 0 on mobile and 6px from tablet up. */}
-      <div
+      {/* Reveal carries the row's own layout classes so the cards are its DIRECT
+          children — `.reveal-stagger > *` only reaches one level, so wrapping the
+          row in a Reveal instead would cascade the whole row as a single unit
+          rather than card by card. */}
+      <Reveal
+        stagger
         className={`flex gap-0 px-0 md:px-[6px] py-6 ${
           variant === "grid" ? "flex-wrap" : "overflow-x-auto scrollbar-thin"
         }`}
@@ -55,7 +61,7 @@ export function BookCarousel({ title, overline, books, viewAllHref, variant = "s
         {books.map((book, i) => (
           <BookCard key={book.id} book={book} priority={i < 3} />
         ))}
-      </div>
+      </Reveal>
 
       {/* "المزيد" sits BELOW the books, not in the header.
           Live puts it in the section header, which means a reader who has just

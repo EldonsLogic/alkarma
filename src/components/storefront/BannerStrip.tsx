@@ -16,7 +16,7 @@ export function BannerStrip({ banners }: { banners: HomeBanner[] }) {
   if (!banners.length) return null;
 
   return (
-    <section className="mx-4 sm:mx-10 py-[23px]">
+    <section className="w-[calc(100%-30px)] sm:w-[calc(100%-80px)] max-w-[1200px] mx-auto py-[23px]">
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 sm:px-[10px]">
         {banners.map((b) => (
           <Link

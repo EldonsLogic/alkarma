@@ -75,6 +75,8 @@ async function getHomeData() {
         take: 5,
         select: {
           id: true, title: true,
+          // subtitle carries the hero CTA's label — see HeroBanner
+          subtitle: true, subtitleAr: true,
           imageUrl: true, imageMobileUrl: true, linkUrl: true,
           imageUrlAr: true, imageMobileUrlAr: true, linkUrlAr: true,
         },
