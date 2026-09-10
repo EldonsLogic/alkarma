@@ -46,12 +46,14 @@ export function HeroBanner({ banners }: Props) {
     .map((b) => ({ id: b.id, title: b.title, cta: b.subtitleAr || b.subtitle || null, ...resolveBanner(b, true) }))
     .filter((b) => b.desktop);
   const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (slides.length <= 1) return;
-    const t = setInterval(() => setCurrent((c) => (c + 1) % slides.length), 5500);
+    if (slides.length <= 1 || paused) return;
+    // Live's Smart Slider: autoplay duration 3500ms, looping, paused on hover.
+    const t = setInterval(() => setCurrent((c) => (c + 1) % slides.length), 3500);
     return () => clearInterval(t);
-  }, [slides.length]);
+  }, [slides.length, paused]);
 
   // No banners uploaded yet — simple branded fallback
   if (slides.length === 0) {
@@ -62,7 +64,7 @@ export function HeroBanner({ banners }: Props) {
       beneath it.
     */
     return (
-      <section className="w-[calc(100%-30px)] sm:w-[calc(100%-80px)] max-w-[1200px] mx-auto my-5 relative bg-paper-mid text-ink flex items-center justify-center aspect-[16/9] sm:aspect-[1200/330]">
+      <section className="w-[calc(100%-30px)] max-w-[1170px] mx-auto my-5 relative bg-paper-mid text-ink flex items-center justify-center aspect-[16/9] sm:aspect-[1170/330]">
         <div className="text-center px-6">
           <p className="text-[12px] text-ink-muted mb-3">{BRAND_SHORT_AR}</p>
           <h1 className="font-display font-bold text-brand mb-5 text-[20px] sm:text-[22px]">
@@ -77,75 +79,90 @@ export function HeroBanner({ banners }: Props) {
   }
 
   return (
-    <section className="relative w-[calc(100%-30px)] sm:w-[calc(100%-80px)] max-w-[1200px] mx-auto my-5">
-      <div className="relative w-full aspect-[16/9] sm:aspect-[1200/330] overflow-hidden bg-paper-mid">
-        {slides.map((b, i) => {
-          const inner = (
-            <>
-              {/* Desktop */}
-              <Image
-                src={b.desktop}
-                alt={b.title ?? ""}
-                fill
-                priority={i === 0}
-                sizes="100vw"
-                className="object-cover hidden sm:block"
-              />
-              {/* Mobile (falls back to desktop image if none uploaded) */}
-              <Image
-                src={b.mobile || b.desktop}
-                alt={b.title ?? ""}
-                fill
-                priority={i === 0}
-                sizes="100vw"
-                className="object-cover sm:hidden"
-              />
-            </>
-          );
-          const active = i === current;
-          return (
-            <div
-              key={b.id}
-              aria-hidden={!active}
-              className={`absolute inset-0 transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                active
-                  ? "opacity-100 scale-100 z-[1]"
-                  : "opacity-0 scale-[1.04] pointer-events-none"
-              }`}
-            >
-              {b.link ? (
-                <Link href={b.link} className="block relative w-full h-full">{inner}</Link>
-              ) : (
-                <div className="relative w-full h-full">{inner}</div>
-              )}
+    <section
+      className="relative w-[calc(100%-30px)] max-w-[1170px] mx-auto my-5"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div className="relative w-full aspect-[16/9] sm:aspect-[1170/330] overflow-hidden bg-paper-mid">
+        {/* Horizontal track, matching live's Smart Slider: mainanimation
+            {type:"horizontal", duration:1500, ease:"easeOutQuad"} — a slide,
+            not the cross-fade this had before.
 
-              {/* CTA floating over the artwork, as on live. The label is the
-                  banner's subtitle, so it is editable from Admin › Banners
-                  without a schema change; a banner with no subtitle simply
-                  shows no button. It rides in slightly after the slide settles. */}
-              {b.cta && b.link && (
-                <Link
-                  href={b.link}
-                  className={`absolute z-[2] bottom-6 sm:bottom-10 start-6 sm:start-12 inline-block bg-brand text-white text-[13px] sm:text-[15px] font-bold px-6 sm:px-8 py-[10px] sm:py-[13px] rounded-[3px] shadow-lg hover:bg-brand-dark transition-all duration-500 ${
-                    active ? "opacity-100 translate-y-0 delay-200" : "opacity-0 translate-y-3"
-                  }`}
-                >
-                  {b.cta}
-                </Link>
-              )}
-            </div>
-          );
-        })}
+            dir="ltr" is deliberate. The page is RTL, which would reverse the
+            flex order and send the track the wrong way; the slides are
+            self-contained artwork, so pinning the track to LTR keeps the
+            transform math straightforward without affecting what is drawn. */}
+        <div
+          dir="ltr"
+          className="flex h-full w-full transition-transform duration-[1500ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+          style={{ transform: `translateX(-${current * 100}%)` }}
+        >
+          {slides.map((b, i) => {
+            const inner = (
+              <>
+                <Image
+                  src={b.desktop}
+                  alt={b.title ?? ""}
+                  fill
+                  priority={i === 0}
+                  sizes="(max-width: 640px) 100vw, 1170px"
+                  className="object-cover hidden sm:block"
+                />
+                <Image
+                  src={b.mobile || b.desktop}
+                  alt={b.title ?? ""}
+                  fill
+                  priority={i === 0}
+                  sizes="100vw"
+                  className="object-cover sm:hidden"
+                />
+              </>
+            );
+            return (
+              <div key={b.id} className="relative w-full h-full shrink-0">
+                {b.link ? (
+                  <Link href={b.link} className="block relative w-full h-full">{inner}</Link>
+                ) : (
+                  <div className="relative w-full h-full">{inner}</div>
+                )}
+
+                {/* CTA over the artwork. Style is live's own button:
+                    background #ff0000, padding 7px 25px, square corners,
+                    Cairo 800 at 87.5% (=14px), white, and anchored to the
+                    LEFT — live's layer sets text-align:left, which is why the
+                    previous right-hand placement read as wrong. The label
+                    comes from the banner's subtitle, so it stays editable in
+                    Admin › Banners. */}
+                {b.cta && b.link && (
+                  <div dir="rtl" className="absolute inset-0 pointer-events-none flex items-center">
+                    <Link
+                      href={b.link}
+                      className={`pointer-events-auto ms-auto me-[8%] mt-[86px] sm:mt-[104px] bg-brand text-white font-extrabold text-[12px] sm:text-[14px] leading-none px-[18px] sm:px-[25px] py-[7px] hover:bg-brand-dark transition-all duration-500 ${
+                        i === current ? "opacity-100 translate-y-0 delay-[600ms]" : "opacity-0 translate-y-2"
+                      }`}
+                    >
+                      {b.cta}
+                    </Link>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {slides.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-[2]">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-[8px] z-[2]">
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              aria-label={`Slide ${i + 1}`}
-              className={`h-[4px] rounded-full transition-all duration-300 ${i === current ? "bg-brand w-9" : "bg-white/70 hover:bg-white w-3"}`}
+              aria-label={`الشريحة ${i + 1}`}
+              /* Live's bullets: 10px circles, #ced3d5 at 0.8, active #ff0000. */
+              className={`w-[10px] h-[10px] rounded-full transition-colors duration-300 ${
+                i === current ? "bg-brand" : "bg-[#ced3d5]/80 hover:bg-brand"
+              }`}
             />
           ))}
         </div>
