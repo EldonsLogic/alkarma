@@ -5,22 +5,23 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCartStore } from "@/stores/cart.store";
 
+function CartIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"}
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="21" r="1" />
+      <circle cx="20" cy="21" r="1" />
+      <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
+    </svg>
+  );
+}
+
 function HomeIcon({ active }: { active: boolean }) {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"}
       stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
       <polyline points="9 22 9 12 15 12 15 22" />
-    </svg>
-  );
-}
-
-function SearchIcon({ active }: { active: boolean }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.15 : 0} />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   );
 }
@@ -72,12 +73,22 @@ export function MobileBottomNav() {
       : "حسابي"
     : "دخول";
 
+  /**
+   * Cart earns a tab here because the header's cart icon is desktop-only: with
+   * it hidden on mobile and no tab, /cart had NO reachable entry point at all,
+   * so anyone who dismissed the slide-out drawer could not get back to their
+   * basket. Live's own bottom bar carries a cart tab for the same reason.
+   *
+   * It replaces the search tab rather than becoming a sixth: search already
+   * has a dedicated magnifier in the mobile header, and live's bottom bar has
+   * no search tab either.
+   */
   const tabs = [
-    { href: "/",                 label: "الرئيسية",     Icon: HomeIcon },
-    { href: "/search",           label: "بحث",        Icon: SearchIcon },
-    { href: "/category",         label: "الأقسام",    Icon: BrowseIcon },
-    { href: "/account/wishlist", label: "المفضلة",  Icon: WishlistIcon },
-    { href: accountHref,         label: accountLabel,                     Icon: AccountIcon },
+    { href: "/",                 label: "الرئيسية", Icon: HomeIcon,     badge: 0 },
+    { href: "/category",         label: "الأقسام",  Icon: BrowseIcon,   badge: 0 },
+    { href: "/cart",             label: "السلة",    Icon: CartIcon,     badge: itemCount },
+    { href: "/account/wishlist", label: "المفضلة",  Icon: WishlistIcon, badge: 0 },
+    { href: accountHref,         label: accountLabel, Icon: AccountIcon, badge: 0 },
   ];
 
   function isActive(href: string) {
@@ -91,7 +102,7 @@ export function MobileBottomNav() {
       style={{ background: "var(--paper)" }}
     >
       <div className="flex">
-        {tabs.map(({ href, label, Icon }) => {
+        {tabs.map(({ href, label, Icon, badge }) => {
           const active = isActive(href);
           return (
             <Link
@@ -100,9 +111,16 @@ export function MobileBottomNav() {
               className={`flex-1 flex flex-col items-center justify-center py-2 gap-[3px] transition-colors ${
                 active ? "text-brand" : "text-ink-muted"
               }`}
-              aria-label={label}
+              aria-label={badge > 0 ? `${label} (${badge})` : label}
             >
-              <Icon active={active} />
+              <span className="relative">
+                <Icon active={active} />
+                {badge > 0 && (
+                  <span className="absolute -top-1.5 -end-2 min-w-[16px] h-[16px] px-1 rounded-full bg-brand text-white text-[10px] font-bold flex items-center justify-center">
+                    {badge > 99 ? "99+" : badge}
+                  </span>
+                )}
+              </span>
               <span
                 className="text-[10px] tracking-[0.04em]"
 
