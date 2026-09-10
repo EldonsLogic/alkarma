@@ -130,11 +130,19 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         salesCount: b.salesCount,
         stock: b.stock,
       }))}
-      allCategories={allCategories.map((c) => ({
-        slug: c.slug,
-        name: c.name,
-        count: c._count.books,
-      }))}
+      // Empty shelves are dropped from the sidebar. Three of them —
+      // أحدث الإصدارات / الأكثر مبيعًا / عروض وخصومات — are real category rows
+      // that exist only so the nav has something to point at; the actual
+      // listings live at /new-releases, /bestsellers and /deals, so linking
+      // them here sent readers to a permanently empty page. The current
+      // category is kept regardless so the sidebar can still mark it active.
+      allCategories={allCategories
+        .filter((c) => c._count.books > 0 || c.slug === category.slug)
+        .map((c) => ({
+          slug: c.slug,
+          name: c.name,
+          count: c._count.books,
+        }))}
       total={total}
       page={page}
       limit={limit}

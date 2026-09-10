@@ -19,6 +19,24 @@ interface CategoryData extends CategorySummary {
   parent: { id: string; slug: string; name: string; nameAr?: string | null } | null;
 }
 
+/**
+ * The age filter only makes sense on the children's shelves. It was rendering
+ * on every page that reuses this component — new releases, bestsellers, search,
+ * author, translator, publisher and tag — where it offered to narrow a list
+ * whose books carry no ageRange at all.
+ *
+ * Matched on the category itself or its parent, so a sub-shelf of كتب أطفال
+ * keeps the filter. Of the 140 books that do carry an ageRange, 138 are in
+ * كتب-أطفال, 11 in كتب-للناشئة and 4 in تلوين-وأنشطة.
+ */
+const AGE_FILTER_CATEGORY_SLUGS = new Set([
+  "كتب-أطفال",
+  "كتب-للناشئة",
+  "تلوين-وأنشطة",
+  "قصص-مصورة",
+  "picture-books",
+]);
+
 const AGE_RANGES = [
   { value: "preschool", labelEn: "Pre-school",       labelAr: "ما قبل المدرسة" },
   { value: "5-8",       labelEn: "Ages 5–8",         labelAr: "5–8 سنوات"      },
@@ -118,6 +136,16 @@ export function CategoryPageClient({
   // the server always renders the requested page (Next's client router cache
   // otherwise reused the same-pathname entry and the list never changed).
 
+  const showAgeFilter =
+    AGE_FILTER_CATEGORY_SLUGS.has(category.slug) ||
+    (!!category.parent && AGE_FILTER_CATEGORY_SLUGS.has(category.parent.slug));
+  const hasSubcategories = category.children.length > 0;
+  // With the age filter gone from most pages, subcategories are often the only
+  // thing left — and on author/tag/search pages there are none either. Without
+  // this the panel renders as an empty "تصفية" box.
+  const hasAnyFilters = showAgeFilter || hasSubcategories;
+  const hasSidebarCategories = !!allCategories && allCategories.length > 0;
+
   const filterPanel = (
     <div className="space-y-5">
       {category.children.length > 0 && (
@@ -135,7 +163,8 @@ export function CategoryPageClient({
         </div>
       )}
 
-      {/* Age Range */}
+      {/* Age Range — children's shelves only, see AGE_FILTER_CATEGORY_SLUGS */}
+      {showAgeFilter && (
       <div>
         <div className="text-[11px] font-bold uppercase tracking-[0.12em] mb-2.5 pb-1.5 border-b border-paper-dark text-ink-muted">{t.ageRange}</div>
         <ul className="space-y-1.5">
@@ -161,6 +190,7 @@ export function CategoryPageClient({
           )}
         </ul>
       </div>
+      )}
 
       <button
         onClick={() => setMobileFiltersOpen(false)}
@@ -259,6 +289,7 @@ export function CategoryPageClient({
               </svg>
             </div>
 
+            {hasAnyFilters && (
             <button
               onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
               aria-expanded={mobileFiltersOpen}
@@ -273,12 +304,13 @@ export function CategoryPageClient({
               </svg>
               {t.filters}
             </button>
+            )}
           </div>
         </div>
       </div>
 
       {/* Mobile filter panel */}
-      {mobileFiltersOpen && (
+      {hasAnyFilters && mobileFiltersOpen && (
         <div className="md:hidden bg-paper border-b border-paper-dark px-4 py-5">
           <h2 className="font-display text-[18px] font-bold text-ink mb-5">{t.filters}</h2>
           {filterPanel}
@@ -287,6 +319,7 @@ export function CategoryPageClient({
 
       <div className="flex items-start max-w-[1400px] mx-auto">
         {/* Desktop sidebar */}
+        {(hasSidebarCategories || hasAnyFilters) && (
         <aside className="hidden md:block w-[260px] flex-shrink-0 px-6 py-6 border-e border-paper-dark bg-paper sticky top-[73px] max-h-[calc(100vh-73px)] overflow-y-auto">
           {allCategories && allCategories.length > 0 && (
             <div className="mb-7">
@@ -313,9 +346,14 @@ export function CategoryPageClient({
             </div>
           )}
 
-          <h2 className="font-display text-[17px] font-bold text-ink mb-4 pb-2 border-b border-paper-dark">{t.filter}</h2>
-          {filterPanel}
+          {hasAnyFilters && (
+            <>
+              <h2 className="font-display text-[17px] font-bold text-ink mb-4 pb-2 border-b border-paper-dark">{t.filter}</h2>
+              {filterPanel}
+            </>
+          )}
         </aside>
+        )}
 
         {/* Main */}
         <main className="flex-1 min-w-0 px-4 sm:px-8 py-4 sm:py-6">
