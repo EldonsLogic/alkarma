@@ -21,7 +21,7 @@ function CoverFan({ covers }: { covers: NonNullable<BundleSummary["covers"]> }) 
         return (
           <div
             key={i}
-            className="relative aspect-[2/3] w-[78px] rounded-sm overflow-hidden bg-paper-dark shadow-book group-hover:shadow-book-hover ring-1 ring-black/10 transition-all"
+            className="relative aspect-[2/3] w-[78px] overflow-hidden transition-all"
             style={{
               zIndex: 10 - Math.round(Math.abs(offset) * 2),
               transform: `rotate(${offset * 6}deg) translateY(${Math.abs(offset) * 10}px)`,

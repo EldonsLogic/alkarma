@@ -442,11 +442,13 @@ function ProductCard({ book }: { book: BookSummary; }) {
   return (
     <Link href={`/book/${book.slug}`} className="group flex flex-col cursor-pointer">
       <div className="relative flex-shrink-0">
-        <div className="w-full aspect-[2/3] bg-paper shadow-card group-hover:shadow-card-hover transition-all duration-150 overflow-hidden">
+        <div className="w-full aspect-[2/3] transition-all duration-150 overflow-hidden">
           {book.coverUrl && !false ? (
-            // object-contain: some covers aren't a clean 2:3 ratio — contain shows the
-            // whole cover (letterboxed on bg-paper, matching the page background so it
-            // blends in) instead of cropping it or standing out as a grey/beige box.
+            // object-contain on a TRANSPARENT frame: a third of the catalogue's
+            // covers are square rather than 2:3, so contain is what shows them
+            // whole. The frame paints no background and casts no shadow — a
+            // white box around a letterboxed cover was what made the mismatch
+            // obvious; with nothing behind it the cover sits straight on the page.
             <Image src={book.coverUrl} alt={book.title} fill className="object-contain" />
           ) : (
             <div className="w-full h-full flex items-center justify-center p-3">

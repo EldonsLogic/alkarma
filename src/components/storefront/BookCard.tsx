@@ -125,7 +125,7 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
             height={172}
             sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 20vw"
             priority={priority}
-            className="book-cover-img w-full aspect-square object-contain block bg-paper transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+            className="book-cover-img w-full aspect-square object-contain block transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (
           <div className="book-cover-img w-full aspect-square bg-paper-mid flex items-center justify-center p-3">

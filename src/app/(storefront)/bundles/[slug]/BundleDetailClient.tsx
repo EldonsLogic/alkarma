@@ -122,7 +122,7 @@ export function BundleDetailClient({ bundle }: Props) {
                   return (
                     <div
                       key={item.book.id}
-                      className="relative aspect-[2/3] w-[130px] sm:w-[150px] rounded-sm overflow-hidden bg-paper-dark shadow-book-hover ring-1 ring-black/10"
+                      className="relative aspect-[2/3] w-[130px] sm:w-[150px] overflow-hidden"
                       style={{
                         zIndex: 20 - Math.round(Math.abs(offset) * 2),
                         transform: `rotate(${offset * 6}deg) translateY(${Math.abs(offset) * 16}px)`,

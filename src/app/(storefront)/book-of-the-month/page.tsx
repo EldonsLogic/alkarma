@@ -103,7 +103,7 @@ export default async function BookOfTheMonthPage() {
             {/* Main pick */}
             <div className="grid grid-cols-1 sm:grid-cols-[280px_1fr] gap-10 items-start mb-16">
               <div>
-                <div className="relative w-full aspect-[2/3] shadow-xl max-w-[280px]">
+                <div className="relative w-full aspect-[2/3] max-w-[280px]">
                   {mainBook.coverUrl ? (
                     <Image
                       src={mainBook.coverUrl}
@@ -189,7 +189,7 @@ export default async function BookOfTheMonthPage() {
                   href={`/book/${book.slug}`}
                   className="group flex flex-col gap-2"
                 >
-                  <div className="relative w-full aspect-[2/3] bg-paper-mid">
+                  <div className="relative w-full aspect-[2/3]">
                     {book.coverUrl ? (
                       <Image
                         src={book.coverUrl}

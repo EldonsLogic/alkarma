@@ -130,14 +130,14 @@ export default function CartPage() {
 
                     {/* Cover */}
                     <Link href={`/book/${item.slug}`} className="flex-shrink-0 block">
-                      <div className="w-[80px] sm:w-[90px] h-[120px] sm:h-[135px] bg-paper-mid shadow-book overflow-hidden">
+                      <div className="w-[80px] sm:w-[90px] h-[120px] sm:h-[135px] overflow-hidden">
                         {item.coverUrl ? (
                           <Image
                             src={item.coverUrl}
                             alt={item.title}
                             width={90}
                             height={135}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center p-2">

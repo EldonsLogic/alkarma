@@ -217,7 +217,7 @@ export function PDPClient({ book, related, similar, moreByAuthor, externalReview
 
         {/* ── Col 1: Cover + gallery ── */}
         <div className="flex flex-col items-center md:items-start">
-          <div className="relative aspect-[2/3] w-full max-w-[256px] bg-paper shadow-xl">
+          <div className="relative aspect-[2/3] w-full max-w-[256px]">
             {activeImage ? (
               // object-contain: covers that aren't a clean 2:3 ratio are shown in full,
               // letterboxed on bg-paper (matches the page background) instead of cropped.
@@ -253,7 +253,7 @@ export function PDPClient({ book, related, similar, moreByAuthor, externalReview
                   onMouseEnter={() => setActiveImage(img)}
                   onClick={() => setActiveImage(img)}
                   aria-label="عرض الصورة"
-                  className={`relative w-[48px] h-[72px] flex-shrink-0 overflow-hidden bg-paper border-2 transition-colors ${
+                  className={`relative w-[48px] h-[72px] flex-shrink-0 overflow-hidden border-2 transition-colors ${
                     activeImage === img ? "border-brand" : "border-paper-dark hover:border-brand/60"
                   }`}
                 >
@@ -460,8 +460,8 @@ export function PDPClient({ book, related, similar, moreByAuthor, externalReview
       >
         <div className="max-w-[1200px] mx-auto px-4 sm:px-10 py-3 flex items-center gap-4">
           {book.coverUrl && (
-            <div className="relative w-10 h-[60px] flex-shrink-0 hidden sm:block bg-paper">
-              <Image src={book.coverUrl} alt={displayTitle} fill className="object-contain shadow-sm" />
+            <div className="relative w-10 h-[60px] flex-shrink-0 hidden sm:block">
+              <Image src={book.coverUrl} alt={displayTitle} fill className="object-contain" />
             </div>
           )}
           <div className="flex-1 min-w-0 hidden sm:block">

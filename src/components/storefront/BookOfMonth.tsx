@@ -52,7 +52,7 @@ export function BookOfMonth({ book }: { book: BookOfMonthData; }) {
           >
             {/* Cover */}
             <Link href={`/book/${book.slug}`} className="block group w-[170px] sm:w-[200px]">
-              <div className="relative w-full aspect-[2/3] bg-paper-dark shadow-book group-hover:shadow-book-hover transition-shadow">
+              <div className="relative w-full aspect-[2/3]">
                 {book.coverUrl ? (
                   <Image src={book.coverUrl} alt={title} fill sizes="200px" className="object-cover" />
                 ) : (
