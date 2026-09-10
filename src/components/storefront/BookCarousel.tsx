@@ -43,14 +43,6 @@ export function BookCarousel({ title, overline, books, viewAllHref, variant = "s
             {title}
           </h2>
         </div>
-        {viewAllHref && (
-          <Link
-            href={viewAllHref}
-            className="text-[13px] text-ink-muted hover:text-brand font-semibold whitespace-nowrap transition-colors"
-          >
-            المزيد ‹
-          </Link>
-        )}
       </div>
 
       {/* gap-0 and no inline padding: the gutter is the cards' own padding, as
@@ -64,6 +56,21 @@ export function BookCarousel({ title, overline, books, viewAllHref, variant = "s
           <BookCard key={book.id} book={book} priority={i < 3} />
         ))}
       </div>
+
+      {/* "المزيد" sits BELOW the books, not in the header.
+          Live puts it in the section header, which means a reader who has just
+          scrolled the whole rail has to scroll back up to act on it. Putting it
+          where the reading ends is a deliberate departure from live. */}
+      {viewAllHref && (
+        <div className="px-5 sm:px-7 pb-6 -mt-2 flex justify-center">
+          <Link
+            href={viewAllHref}
+            className="inline-block border border-paper-dark px-6 py-[9px] text-[13px] font-semibold text-ink hover:text-brand hover:border-brand transition-colors"
+          >
+            المزيد ‹
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

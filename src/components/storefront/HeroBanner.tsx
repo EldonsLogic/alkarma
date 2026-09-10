@@ -53,8 +53,14 @@ export function HeroBanner({ banners }: Props) {
 
   // No banners uploaded yet — simple branded fallback
   if (slides.length === 0) {
+    /*
+      Live's hero fills the 1200-wide container at 330px tall and carries no
+      border — measured on the live homepage. The old 1170 ratio and the panel
+      border made it sit narrower than, and visually detached from, the rails
+      beneath it.
+    */
     return (
-      <section className="mx-4 sm:mx-10 my-5 relative bg-paper border border-paper-dark text-ink flex items-center justify-center aspect-[16/9] sm:aspect-[1170/330]">
+      <section className="mx-4 sm:mx-10 my-5 relative bg-paper-mid text-ink flex items-center justify-center aspect-[16/9] sm:aspect-[1200/330]">
         <div className="text-center px-6">
           <p className="text-[12px] text-ink-muted mb-3">{BRAND_SHORT_AR}</p>
           <h1 className="font-display font-bold text-brand mb-5 text-[20px] sm:text-[22px]">
@@ -70,7 +76,7 @@ export function HeroBanner({ banners }: Props) {
 
   return (
     <section className="relative mx-4 sm:mx-10 my-5">
-      <div className="relative w-full aspect-[16/9] sm:aspect-[1170/330] overflow-hidden bg-paper-mid">
+      <div className="relative w-full aspect-[16/9] sm:aspect-[1200/330] overflow-hidden bg-paper-mid">
         {slides.map((b, i) => {
           const inner = (
             <>

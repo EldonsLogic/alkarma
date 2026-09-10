@@ -2,9 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { BookCarousel } from "@/components/storefront/BookCarousel";
 import { BRAND_AR } from "@/lib/brand";
 import { newReleaseWhere, NEW_RELEASE_ORDER_BY } from "@/lib/newReleases";
+import { BannerStrip } from "@/components/storefront/BannerStrip";
+import { HOME_BANNER_STRIPS } from "@/content/home-banners";
 import { CategoryGrid } from "@/components/storefront/CategoryGrid";
 import { HeroBanner } from "@/components/storefront/HeroBanner";
-import { CampaignBanner } from "@/components/storefront/CampaignBanner";
 import { BundleRow } from "@/components/storefront/BundleRow";
 import { BookOfMonth } from "@/components/storefront/BookOfMonth";
 import { AdoptSection } from "@/components/storefront/AdoptSection";
@@ -284,14 +285,7 @@ export default async function HomePage() {
         </Reveal>
       )}
 
-      {/* Campaign banner — image managed from Admin › Content */}
-      <Reveal>
-        <CampaignBanner
-          imageUrl={campaign.imageUrl || undefined}
-          imageMobileUrl={campaign.imageMobileUrl || undefined}
-          href={campaign.href}
-        />
-      </Reveal>
+      <Reveal><BannerStrip banners={HOME_BANNER_STRIPS[0]} /></Reveal>
 
       {bestsellers.length > 0 && (
         <Reveal>
@@ -304,6 +298,8 @@ export default async function HomePage() {
         </Reveal>
       )}
 
+      <Reveal><BannerStrip banners={HOME_BANNER_STRIPS[1]} /></Reveal>
+
       {imprintPicks.length > 0 && (
         <Reveal>
           <BookCarousel
@@ -314,6 +310,8 @@ export default async function HomePage() {
           />
         </Reveal>
       )}
+
+      <Reveal><BannerStrip banners={HOME_BANNER_STRIPS[2]} /></Reveal>
 
       {/* Only one book in the seed catalogue carries a compareAt price, so this
           rail stays hidden until there are enough real markdowns to fill a row.
@@ -328,6 +326,11 @@ export default async function HomePage() {
           />
         </Reveal>
       )}
+
+      {/* Tied to the offers rail: that rail hides itself until there are enough
+          real markdowns, and without this the third and fourth strips would
+          render back to back with no books between them. */}
+      {offers.length >= 5 && <Reveal><BannerStrip banners={HOME_BANNER_STRIPS[3]} /></Reveal>}
 
       {/* ── Sections the live homepage does not have ─────────────────────
           Switched off so this homepage matches the live site as-is. Nothing
