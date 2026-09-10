@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/storefront/CartDrawer";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { NavProgress } from "@/components/layout/NavProgress";
 import { prisma } from "@/lib/prisma";
 import { BRAND_AR, BRAND_LATIN, SITE_URL } from "@/lib/brand";
 import { GTM_ID } from "@/lib/gtm";
@@ -187,6 +188,9 @@ export default async function RootLayout({
           <Providers>
             <div className="flex flex-col min-h-screen">
               <Header navCategories={navCategories} />
+              {/* Client-side navigation shows no browser loading indicator —
+                  see NavProgress. */}
+              <NavProgress />
               <main className="flex-1 pb-16 md:pb-0">{children}</main>
               <Footer />
               <MobileBottomNav />
