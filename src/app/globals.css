@@ -252,3 +252,24 @@ input, select, textarea { font-family: inherit; }
 .legal-doc li { margin-bottom: 10px; }
 .legal-doc strong { color: var(--ink, #000000); font-weight: 700; }
 .legal-doc a { color: #ff0000; text-decoration: underline; }
+
+/* ── Book covers: neutralise baked-in white padding ─────────────────────────
+   Roughly a third of the catalogue (442 of 1,347 covers) ships as a SQUARE
+   canvas with the artwork padded out in white — e.g. الخادمة is 600x600 with
+   the 434x598 cover centred and 82px of solid white pixels down each side.
+
+   That white is IN THE IMAGE, not the frame, so making the frame transparent
+   did nothing for it: the image still paints a white block onto the page.
+
+   multiply blends each pixel with what is behind it. White is the identity
+   colour for multiply, so the padding takes the page's own background exactly
+   and disappears, while the artwork keeps its colour. The storefront only ever
+   puts covers on white or #F0F0F0, so the artwork darkens by at most ~6% —
+   invisible in practice, and only on the light end of the cover.
+
+   This is a render-time fix. The proper fix is to trim the padding out of the
+   442 files and re-upload them, which needs a Blob write token. */
+.book-cover-img,
+.cover-img {
+  mix-blend-mode: multiply;
+}

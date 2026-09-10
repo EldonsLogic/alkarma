@@ -137,7 +137,7 @@ export default function CartPage() {
                             alt={item.title}
                             width={90}
                             height={135}
-                            className="w-full h-full object-contain"
+                            className="cover-img w-full h-full object-contain"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center p-2">

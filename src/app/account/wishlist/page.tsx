@@ -87,7 +87,7 @@ export default async function WishlistPage() {
                     alt={book.title}
                     width={72}
                     height={108}
-                    sizes="72px" className="w-[72px] h-[108px] object-contain"
+                    sizes="72px" className="cover-img w-[72px] h-[108px] object-contain"
                   />
                 ) : (
                   <div className="w-[72px] h-[108px] bg-gradient-to-br from-[#e0e0e0] to-[#f0f0f0] flex items-center justify-center p-2">

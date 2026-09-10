@@ -226,7 +226,7 @@ export function PDPClient({ book, related, similar, moreByAuthor, externalReview
                 src={activeImage}
                 alt={displayTitle}
                 fill
-                className="object-contain"
+                className="cover-img object-contain"
                 priority
                 sizes="(max-width: 768px) 80vw, 256px"
               />
@@ -257,7 +257,7 @@ export function PDPClient({ book, related, similar, moreByAuthor, externalReview
                     activeImage === img ? "border-brand" : "border-paper-dark hover:border-brand/60"
                   }`}
                 >
-                  <Image src={img} alt="" fill className="object-contain" sizes="48px" />
+                  <Image src={img} alt="" fill className="cover-img object-contain" sizes="48px" />
                 </button>
               ))}
             </div>
@@ -461,7 +461,7 @@ export function PDPClient({ book, related, similar, moreByAuthor, externalReview
         <div className="max-w-[1200px] mx-auto px-4 sm:px-10 py-3 flex items-center gap-4">
           {book.coverUrl && (
             <div className="relative w-10 h-[60px] flex-shrink-0 hidden sm:block">
-              <Image src={book.coverUrl} alt={displayTitle} fill className="object-contain" />
+              <Image src={book.coverUrl} alt={displayTitle} fill className="cover-img object-contain" />
             </div>
           )}
           <div className="flex-1 min-w-0 hidden sm:block">
