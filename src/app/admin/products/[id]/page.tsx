@@ -47,7 +47,7 @@ async function updateProduct(formData: FormData) {
       dimensions: ((formData.get("dimensions") as string) || "").trim() || null,
       coverType: ((formData.get("coverType") as string) || "").trim() || null,
       language,
-      coverUrl: (formData.get("coverUrl") as string)?.trim() || "/covers/placeholder.jpg",
+      coverUrl: (formData.get("coverUrl") as string)?.trim() || "",
       priceEgp,
       compareAtEgp: formData.get("compareAtEgp") ? parseFloat(formData.get("compareAtEgp") as string) : null,
       stock: parseInt(formData.get("stock") as string, 10) || 0,

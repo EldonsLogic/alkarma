@@ -81,6 +81,10 @@ export function ImageUpload({
     }
   }
 
+  // "No cover" is stored as "" everywhere this project writes it: the upstream
+  // /covers/placeholder.jpg is not a real asset here, so persisting that path
+  // renders a broken image rather than the storefront's title-tile fallback.
+  // The /covers/placeholder check is kept only to recognise legacy rows.
   const isPlaceholder = !url || url.includes("/covers/placeholder");
 
   const previewClass =

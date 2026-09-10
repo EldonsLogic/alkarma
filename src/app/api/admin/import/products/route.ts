@@ -353,7 +353,7 @@ export async function POST(req: NextRequest) {
 
     if (zippedImageUrl || mediaImageUrl) results.imagesMatched++;
 
-    const coverUrl = csvCoverUrl ?? zippedImageUrl ?? mediaImageUrl ?? "/covers/placeholder.jpg";
+    const coverUrl = csvCoverUrl ?? zippedImageUrl ?? mediaImageUrl ?? "";
 
     const data = {
       type: "BOOK",

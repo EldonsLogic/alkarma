@@ -30,7 +30,7 @@ async function createStationery(formData: FormData) {
       synopsis: (formData.get("synopsis") as string)?.trim() || "",
       synopsisAr: (formData.get("synopsisAr") as string)?.trim() || null,
       author: "",
-      coverUrl: (formData.get("coverUrl") as string)?.trim() || "/covers/placeholder.jpg",
+      coverUrl: (formData.get("coverUrl") as string)?.trim() || "",
       priceEgp,
       compareAtEgp: formData.get("compareAtEgp") ? parseFloat(formData.get("compareAtEgp") as string) : null,
       stock: parseInt(formData.get("stock") as string, 10) || 0,

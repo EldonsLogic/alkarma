@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       synopsis: String(row.description ?? "").trim() || "",
       synopsisAr: String(row.descriptionAr ?? "").trim() || null,
       author: "",
-      coverUrl: String(row.coverUrl ?? "").trim() || "/covers/placeholder.jpg",
+      coverUrl: String(row.coverUrl ?? "").trim() || "",
       priceEgp,
       compareAtEgp: row.compareAtEgp ? parseFloat(String(row.compareAtEgp)) : null,
       stock: parseInt(String(row.stock ?? "0")) || 0,

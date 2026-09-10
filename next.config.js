@@ -44,13 +44,29 @@ const nextConfig = {
     // 'unsafe-inline'/'unsafe-eval' on script-src are required by Next.js's
     // hydration bootstrap and GTM; the rest of the policy still blocks plugin
     // content, base-tag hijacking, off-site form posts, and framing.
+    //
+    // Marketing tags are pre-authorised here BEFORE being wired up in GTM,
+    // because a CSP-blocked tag is close to invisible: GTM reports the tag as
+    // fired and the vendor dashboard simply shows no data — the only evidence
+    // is a violation in the browser console that nobody thinks to look at.
+    // Pre-allowed: Microsoft Clarity, Meta Pixel, TikTok Pixel.
+    //
+    // This is NOT a blanket allowance. Any other tag added later still needs
+    // its own domains added to the relevant directives, or it will fail the
+    // same silent way.
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googletagmanager.com https://*.google-analytics.com https://va.vercel-scripts.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googletagmanager.com https://*.google-analytics.com https://va.vercel-scripts.com " +
+        // Clarity / Meta Pixel / TikTok Pixel loaders
+        "https://*.clarity.ms https://connect.facebook.net https://*.facebook.net https://analytics.tiktok.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://covers.openlibrary.org https://books.google.com https://lh3.googleusercontent.com https://*.googletagmanager.com https://*.google-analytics.com https://*.googleusercontent.com",
+      "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://covers.openlibrary.org https://books.google.com https://lh3.googleusercontent.com https://*.googletagmanager.com https://*.google-analytics.com https://*.googleusercontent.com " +
+        // Tracking pixels fired as images (Meta's /tr, TikTok, Clarity)
+        "https://www.facebook.com https://analytics.tiktok.com https://*.clarity.ms https://c.bing.com",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com",
+      "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://vitals.vercel-insights.com https://va.vercel-scripts.com " +
+        // Beacon/XHR endpoints for the same three tags
+        "https://*.clarity.ms https://c.bing.com https://connect.facebook.net https://www.facebook.com https://analytics.tiktok.com",
       "frame-src 'self' https://*.googletagmanager.com",
       "object-src 'none'",
       "base-uri 'self'",
