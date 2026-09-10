@@ -221,13 +221,15 @@ export function CategoryPageClient({
       })()}
 
       {/* Mobile toolbar */}
-      {/* Mobile results / sort / filter bar.
-          Was a cramped 12px row on a hairline border that read as washed out
-          against the grey page. Now a taller bar with a real shadow so it
-          separates when stuck, a properly sized native select with its own
-          chevron (the default arrow is invisible on this background in RTL),
-          and a filter button with enough weight to look tappable. */}
-      <div className="md:hidden sticky top-[60px] z-10 bg-paper border-b border-paper-dark shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+      {/* Mobile results / sort / filter row.
+          NOT sticky. It used to stick under the header, which meant a solid
+          white slab hung over the grey page and sliced the card grid in half as
+          it scrolled past — cards were cut mid-cover behind it. Live does not
+          stick this either: its orderby select sits in normal flow near the top
+          of the results and simply scrolls away, so this now does the same.
+          Without the overlay there is nothing to separate from, so the shadow
+          is gone too. */}
+      <div className="md:hidden bg-paper border-b border-paper-dark">
         <div className="flex items-center justify-between gap-3 px-4 py-[10px]">
           <p className="text-[13px] text-ink-muted whitespace-nowrap">
             <strong className="text-ink font-bold text-[15px]">{total}</strong> نتيجة
