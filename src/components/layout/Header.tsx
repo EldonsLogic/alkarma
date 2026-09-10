@@ -133,7 +133,7 @@ export function Header({ navCategories }: Props) {
         {/* Live's masthead sits on #F4F4F4, a shade off the white nav bar
             below it — measured on the live header. bg-paper (white) made the
             two bars read as one slab. */}
-        <nav className="bg-[#F4F4F4] border-b border-paper-dark px-4 md:px-10 flex items-center gap-3 md:gap-6 h-[60px] md:h-[72px] sticky top-0 z-[101] shadow-[0_1px_4px_rgba(26,18,8,0.07)]">
+        <nav className="relative bg-[#F4F4F4] border-b border-paper-dark px-4 md:px-10 flex items-center gap-3 md:gap-6 h-[60px] md:h-[72px] sticky top-0 z-[101] shadow-[0_1px_4px_rgba(26,18,8,0.07)]">
 
           {/* Hamburger */}
           <button
@@ -147,13 +147,19 @@ export function Header({ navCategories }: Props) {
           </button>
 
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0" aria-label={`${BRAND_AR} — الصفحة الرئيسية`}>
+          {/* Centred on mobile, as live has it. left/translate are physical
+              properties, so this behaves the same regardless of RTL. */}
+          <Link
+            href="/"
+            className="flex-shrink-0 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 lg:static lg:translate-x-0 lg:translate-y-0"
+            aria-label={`${BRAND_AR} — الصفحة الرئيسية`}
+          >
             <Image
               src="/logo.png"
               alt={BRAND_SHORT_AR}
               width={132}
               height={44}
-              className="h-[36px] md:h-[44px] w-auto object-contain"
+              className="h-[26px] lg:h-[44px] w-auto object-contain"
               priority
             />
           </Link>
@@ -177,7 +183,7 @@ export function Header({ navCategories }: Props) {
           </form>
 
           {/* Right icons */}
-          <div className="flex items-center gap-3 md:gap-4 ml-auto">
+          <div className="flex items-center gap-3 md:gap-4 ms-auto">
             <button
               className="lg:hidden flex flex-col items-center gap-[2px]"
               onClick={() => { setMobileSearchOpen(!mobileSearchOpen); setMobileMenuOpen(false); }}
@@ -188,9 +194,13 @@ export function Header({ navCategories }: Props) {
               </svg>
             </button>
 
+            {/* Wishlist and account are hidden on mobile: live's mobile header
+                is just search / logo / menu, and both are already reachable
+                from the bottom tab bar. Six icons crammed into a 375px bar was
+                the clutter in the screenshots. */}
             <Link href="/account/wishlist" aria-label="المفضلة"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex flex-col items-center gap-[2px]">
+              className="hidden lg:flex flex-col items-center gap-[2px]">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
               </svg>
@@ -205,7 +215,7 @@ export function Header({ navCategories }: Props) {
               return (
                 <Link href={href} aria-label={session ? "My account" : "Sign in"}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex flex-col items-center gap-[2px]">
+                  className="hidden lg:flex flex-col items-center gap-[2px]">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
@@ -215,7 +225,8 @@ export function Header({ navCategories }: Props) {
               );
             })()}
 
-            <span onClick={() => setMobileMenuOpen(false)}>
+            {/* Cart likewise: desktop only, it is in the bottom tab bar on mobile. */}
+            <span className="hidden lg:block" onClick={() => setMobileMenuOpen(false)}>
               <CartIcon />
             </span>
           </div>

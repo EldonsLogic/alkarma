@@ -43,7 +43,7 @@ export function HeroBanner({ banners }: Props) {
   // Resolve each slide for the active language (with cross-language fallback),
   // then keep only slides that actually have an image to show.
   const slides = banners
-    .map((b) => ({ id: b.id, title: b.title, cta: b.subtitleAr || b.subtitle || null, ...resolveBanner(b, true) }))
+    .map((b) => ({ id: b.id, title: b.title, ...resolveBanner(b, true) }))
     .filter((b) => b.desktop);
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -64,7 +64,7 @@ export function HeroBanner({ banners }: Props) {
       beneath it.
     */
     return (
-      <section className="w-[calc(100%-30px)] max-w-[1170px] mx-auto my-5 relative bg-paper-mid text-ink flex items-center justify-center aspect-[16/9] sm:aspect-[1170/330]">
+      <section className="w-[calc(100%-30px)] max-w-[1170px] mx-auto my-5 relative bg-paper-mid text-ink flex items-center justify-center aspect-[1170/330]">
         <div className="text-center px-6">
           <p className="text-[12px] text-ink-muted mb-3">{BRAND_SHORT_AR}</p>
           <h1 className="font-display font-bold text-brand mb-5 text-[20px] sm:text-[22px]">
@@ -77,47 +77,41 @@ export function HeroBanner({ banners }: Props) {
       </section>
     );
   }
-
   return (
     <section
       className="relative w-[calc(100%-30px)] max-w-[1170px] mx-auto my-5"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="relative w-full aspect-[16/9] sm:aspect-[1170/330] overflow-hidden bg-paper-mid">
+      {/* One ratio at every width. The slides are 1170x330 and live shows them
+          whole on mobile too — the old 16/9 mobile ratio cropped them. */}
+      <div className="relative w-full aspect-[1170/330] overflow-hidden bg-paper-mid">
         {/* Horizontal track, matching live's Smart Slider: mainanimation
-            {type:"horizontal", duration:1500, ease:"easeOutQuad"} — a slide,
-            not the cross-fade this had before.
+            {type:"horizontal", duration:1500, ease:"easeOutQuad"}.
 
             dir="ltr" is deliberate. The page is RTL, which would reverse the
             flex order and send the track the wrong way; the slides are
             self-contained artwork, so pinning the track to LTR keeps the
-            transform math straightforward without affecting what is drawn. */}
+            transform maths straightforward without affecting what is drawn. */}
         <div
           dir="ltr"
           className="flex h-full w-full transition-transform duration-[1500ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
           {slides.map((b, i) => {
+            /* ONE image, contained rather than cropped, and no separate mobile
+               artwork — live adapts the same slide to every screen, so this
+               deliberately does NOT follow the upstream project's practice of
+               uploading a second mobile banner. */
             const inner = (
-              <>
-                <Image
-                  src={b.desktop}
-                  alt={b.title ?? ""}
-                  fill
-                  priority={i === 0}
-                  sizes="(max-width: 640px) 100vw, 1170px"
-                  className="object-cover hidden sm:block"
-                />
-                <Image
-                  src={b.mobile || b.desktop}
-                  alt={b.title ?? ""}
-                  fill
-                  priority={i === 0}
-                  sizes="100vw"
-                  className="object-cover sm:hidden"
-                />
-              </>
+              <Image
+                src={b.desktop}
+                alt={b.title ?? ""}
+                fill
+                priority={i === 0}
+                sizes="(max-width: 1200px) 100vw, 1170px"
+                className="object-contain"
+              />
             );
             return (
               <div key={b.id} className="relative w-full h-full shrink-0">
@@ -126,40 +120,21 @@ export function HeroBanner({ banners }: Props) {
                 ) : (
                   <div className="relative w-full h-full">{inner}</div>
                 )}
-
-                {/* CTA over the artwork. Style is live's own button:
-                    background #ff0000, padding 7px 25px, square corners,
-                    Cairo 800 at 87.5% (=14px), white, and anchored to the
-                    LEFT — live's layer sets text-align:left, which is why the
-                    previous right-hand placement read as wrong. The label
-                    comes from the banner's subtitle, so it stays editable in
-                    Admin › Banners. */}
-                {b.cta && b.link && (
-                  <div dir="rtl" className="absolute inset-0 pointer-events-none flex items-center">
-                    <Link
-                      href={b.link}
-                      className={`pointer-events-auto ms-auto me-[8%] mt-[86px] sm:mt-[104px] bg-brand text-white font-extrabold text-[12px] sm:text-[14px] leading-none px-[18px] sm:px-[25px] py-[7px] hover:bg-brand-dark transition-all duration-500 ${
-                        i === current ? "opacity-100 translate-y-0 delay-[600ms]" : "opacity-0 translate-y-2"
-                      }`}
-                    >
-                      {b.cta}
-                    </Link>
-                  </div>
-                )}
               </div>
             );
           })}
         </div>
       </div>
 
+      {/* Bullets sit BELOW the artwork, as live's do — not floating over it.
+          10px circles, #ced3d5 at 80%, active brand red. */}
       {slides.length > 1 && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-[8px] z-[2]">
+        <div className="flex items-center justify-center gap-[8px] mt-3">
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
               aria-label={`الشريحة ${i + 1}`}
-              /* Live's bullets: 10px circles, #ced3d5 at 0.8, active #ff0000. */
               className={`w-[10px] h-[10px] rounded-full transition-colors duration-300 ${
                 i === current ? "bg-brand" : "bg-[#ced3d5]/80 hover:bg-brand"
               }`}

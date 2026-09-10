@@ -221,32 +221,56 @@ export function CategoryPageClient({
       })()}
 
       {/* Mobile toolbar */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-paper-dark bg-paper sticky top-[60px] z-10">
-        <p className="text-[13px] text-ink-muted">
-          <strong className="text-ink">{total}</strong> نتيجة
-        </p>
-        <div className="flex items-center gap-2">
-          <select
-            value={searchParams.sort ?? "bestselling"}
-            onChange={(e) => updateSearch("sort", e.target.value)}
-            className="px-2 py-1.5 border border-paper-dark rounded-sm text-[12px] bg-paper outline-none text-ink"
-          >
-            <option value="bestselling">{t.sort.bestselling}</option>
-            <option value="newest">{t.sort.newest}</option>
-            <option value="price-asc">{t.sort.priceAsc}</option>
-            <option value="price-desc">{t.sort.priceDesc}</option>
-          </select>
-          <button
-            onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-sm text-[12px] font-bold transition-colors ${
-              hasActiveFilters ? "border-brand text-brand bg-[#FFECEC]" : "border-[#ddd] text-[#333]"
-            }`}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="4" y1="6" x2="20" y2="6" /><line x1="8" y1="12" x2="16" y2="12" /><line x1="11" y1="18" x2="13" y2="18" />
-            </svg>
-            {t.filters}{hasActiveFilters ? " ·" : ""}
-          </button>
+      {/* Mobile results / sort / filter bar.
+          Was a cramped 12px row on a hairline border that read as washed out
+          against the grey page. Now a taller bar with a real shadow so it
+          separates when stuck, a properly sized native select with its own
+          chevron (the default arrow is invisible on this background in RTL),
+          and a filter button with enough weight to look tappable. */}
+      <div className="md:hidden sticky top-[60px] z-10 bg-paper border-b border-paper-dark shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+        <div className="flex items-center justify-between gap-3 px-4 py-[10px]">
+          <p className="text-[13px] text-ink-muted whitespace-nowrap">
+            <strong className="text-ink font-bold text-[15px]">{total}</strong> نتيجة
+          </p>
+
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <select
+                value={searchParams.sort ?? "bestselling"}
+                onChange={(e) => updateSearch("sort", e.target.value)}
+                aria-label={t.sort.bestselling}
+                className="appearance-none ps-3 pe-8 h-[38px] border border-paper-dark rounded-[4px] text-[13px] font-semibold bg-paper outline-none text-ink focus:border-brand transition-colors"
+              >
+                <option value="bestselling">{t.sort.bestselling}</option>
+                <option value="newest">{t.sort.newest}</option>
+                <option value="price-asc">{t.sort.priceAsc}</option>
+                <option value="price-desc">{t.sort.priceDesc}</option>
+              </select>
+              <svg
+                aria-hidden
+                className="pointer-events-none absolute end-2.5 top-1/2 -translate-y-1/2 text-ink-muted"
+                width="12" height="12" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+
+            <button
+              onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+              aria-expanded={mobileFiltersOpen}
+              className={`flex items-center gap-1.5 h-[38px] px-4 rounded-[4px] text-[13px] font-bold transition-colors ${
+                hasActiveFilters
+                  ? "bg-brand text-white"
+                  : "border border-paper-dark text-ink hover:border-brand hover:text-brand"
+              }`}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="4" y1="6" x2="20" y2="6" /><line x1="8" y1="12" x2="16" y2="12" /><line x1="11" y1="18" x2="13" y2="18" />
+              </svg>
+              {t.filters}
+            </button>
+          </div>
         </div>
       </div>
 
