@@ -104,13 +104,22 @@ input, select, textarea { font-family: inherit; }
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-/* ── Book cover hover ── */
+/* ── Book cover hover ──
+   No box-shadow here, deliberately.
+
+   A shadow on .book-cover-img is drawn around the ELEMENT's box — the whole
+   frame — not around the artwork inside it. Covers are object-contain, so
+   unless a cover exactly fills its frame the shadow outlines the letterbox
+   gaps as well. On a white panel those gaps are white, so hovering drew a
+   white card with a shadow around the cover. That was the "white background
+   on hover".
+
+   The lift stays: a transform moves the artwork without painting anything. */
 .book-cover-img {
-  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+  transition: transform 0.12s ease-out;
 }
 .group:hover .book-cover-img {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(26,18,8,0.18);
 }
 
 /* ── Page container ── */
