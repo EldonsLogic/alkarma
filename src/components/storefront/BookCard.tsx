@@ -213,24 +213,21 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
         <PriceDisplay item={book} size="sm" className="mb-[5px] leading-[21.5px]" />
       </div>
 
-      {/* Buy Now + Add to Cart — ported verbatim from Jee, where this works on
-          both platforms.
+      {/* Buy Now + Add to Cart, matching the deployed Jee listing exactly:
+          the reveal is per-BUTTON, not on the wrapper.
 
-          The reveal lives on the WRAPPER, not on each button, and the base
-          state is visible: no opacity utility applies below sm, so the pair is
-          always on for touch; sm:opacity-0 hides it from 640px up and
-          sm:group-hover:opacity-100 brings it back on hover. One opacity
-          property on one element means nothing competes in the cascade — which
-          is what defeated the earlier per-button attempts here.
+            Add to Cart  no opacity gating at all — always visible, at every
+                         width. This is the one that was missing on touch.
+            Buy Now      opacity-0 + group-hover, so it is a desktop-only
+                         affordance; add-to-cart already covers touch.
 
-          This supersedes the earlier catalogue-mode treatment (md:hidden, no
-          buy-now), which matched live but left desktop cards with no controls
-          at all. */}
+          An earlier attempt put the reveal on the shared wrapper, which hid
+          BOTH buttons on desktop until hover. */}
       {showAddToCart && (
-        <div className="mt-auto pt-2 flex flex-col sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
+        <div className="mt-auto pt-2 flex flex-col gap-0">
           <button
             onClick={handleBuyNow}
-            className="w-full py-[7px] bg-ink hover:bg-ink/80 text-white text-[13px] font-bold rounded-t-[3px] transition-colors"
+            className="w-full py-[7px] bg-ink hover:bg-ink/80 text-white text-[13px] font-bold rounded-t-[3px] transition-all duration-150 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 focus:opacity-100 focus:translate-y-0"
             aria-label={`اشترِ ${displayTitle} الآن`}
           >
             اشترِ الآن

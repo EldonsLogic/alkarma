@@ -503,16 +503,20 @@ function ProductCard({ book }: { book: BookSummary; }) {
             .join("، ")}
         </p>
         <PriceDisplay item={book} size="sm" />
-        {/* Same wrapper-level reveal as BookCard, ported from Jee: visible by
-            default (so touch always has it), hidden from sm up, restored on
-            hover. Putting the opacity on the shared wrapper rather than on each
-            button is what makes it work — the per-button variants tried here
-            previously lost in the cascade and left the controls unclickable on
-            BOTH platforms. */}
-        <div className="mt-auto pt-2 flex flex-col gap-0 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
+        {/* Buy Now + Add to Cart, matching the deployed Jee listing exactly:
+          the reveal is per-BUTTON, not on the wrapper.
+
+            Add to Cart  no opacity gating at all — always visible, at every
+                         width. This is the one that was missing on touch.
+            Buy Now      opacity-0 + group-hover, so it is a desktop-only
+                         affordance; add-to-cart already covers touch.
+
+          An earlier attempt put the reveal on the shared wrapper, which hid
+          BOTH buttons on desktop until hover. */}
+        <div className="mt-auto pt-2 flex flex-col gap-0">
           <button
             onClick={handleBuyNow}
-            className="w-full py-2 bg-ink hover:bg-ink/80 text-paper text-[11px] sm:text-[12px] font-bold uppercase tracking-wide rounded-t-sm transition-colors"
+            className="w-full py-2 bg-ink hover:bg-ink/80 text-paper text-[11px] sm:text-[12px] font-bold uppercase tracking-wide rounded-t-sm transition-all duration-150 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 focus:opacity-100 focus:translate-y-0"
           >
             {t.buyNow}
           </button>
