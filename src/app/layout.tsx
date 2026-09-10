@@ -64,16 +64,26 @@ async function getNavCategories() {
           orderBy: { sortOrder: "asc" },
           select: { name: true, nameAr: true, slug: true },
         },
+        _count: {
+          select: { books: { where: { book: { isActive: true, stock: { gt: 0 } } } } },
+        },
       },
     });
 
-    const mapped = cats.map((c) => ({
-      kind: c.kind,
-      name: c.name,
-      nameAr: c.nameAr,
-      slug: c.slug,
-      subcategories: c.children.map((ch) => ({ name: ch.name, nameAr: ch.nameAr, slug: ch.slug })),
-    }));
+    // Every link in the panel has to land on a page with books on it. A
+    // category with nothing in stock renders an empty shelf — or, for an
+    // imprint, a 404 — so it is dropped from the menu until it has stock.
+    // Parents are kept when a child has books, even if the parent row itself
+    // holds none.
+    const mapped = cats
+      .filter((c) => c._count.books > 0 || c.children.length > 0)
+      .map((c) => ({
+        kind: c.kind,
+        name: c.name,
+        nameAr: c.nameAr,
+        slug: c.slug,
+        subcategories: c.children.map((ch) => ({ name: ch.name, nameAr: ch.nameAr, slug: ch.slug })),
+      }));
 
     // A single "التصنيفات" mega-menu holding every category, mirroring the
     // live site's header. Stationery has its own top-level nav link there, so

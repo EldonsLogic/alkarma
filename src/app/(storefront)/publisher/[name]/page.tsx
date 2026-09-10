@@ -30,7 +30,19 @@ export default async function PublisherPage({ params, searchParams }: Props) {
   const sort = searchParams.sort ?? "bestselling";
   const orderBy = resolveSortOrderBy(sort);
 
-  const where = { isActive: true, publisher: name };
+  // Books carry the publisher as free text, and for two imprints the store's
+  // own category name is longer than that text ("دار جامعة حمد بن خليفة للنشر"
+  // vs "جامعة حمد بن خليفة"), so the mega-menu's imprint links 404ed on an
+  // exact match. The PUBLISHER category is the authority when one exists;
+  // the raw string is the fallback for publishers that have no category row.
+  const publisherCategory = await prisma.category.findFirst({
+    where: { kind: "PUBLISHER", name },
+    select: { id: true },
+  });
+
+  const where = publisherCategory
+    ? { isActive: true, categories: { some: { categoryId: publisherCategory.id } } }
+    : { isActive: true, publisher: name };
 
   const [books, total] = await Promise.all([
     prisma.book.findMany({
