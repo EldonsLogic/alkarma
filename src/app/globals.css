@@ -218,6 +218,19 @@ input, select, textarea { font-family: inherit; }
 .reveal-stagger.reveal-in > *:nth-child(6) { transition-delay: 0.32s; }
 .reveal-stagger.reveal-in > *:nth-child(7) { transition-delay: 0.38s; }
 .reveal-stagger.reveal-in > *:nth-child(n+8) { transition-delay: 0.44s; }
+
+/* Release will-change once the reveal has played.
+   will-change: transform/opacity creates a stacking context for as long as it
+   is set — permanently, since .reveal-in only clears the transform, not the
+   hint. That isolated group cut every cover inside a rail off from the page
+   behind it, so the covers' multiply blend had nothing to blend against and
+   the baked-in white padding stayed visible. Dropping the hint after the
+   animation restores the blend, and is what will-change is meant to do
+   anyway — holding it forever keeps a compositor layer alive for nothing. */
+.reveal.reveal-in,
+.reveal-stagger.reveal-in > * {
+  will-change: auto;
+}
 @media (prefers-reduced-motion: reduce) {
   .reveal, .reveal.reveal-in,
   .reveal-stagger > *, .reveal-stagger.reveal-in > * {

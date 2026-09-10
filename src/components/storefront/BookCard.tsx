@@ -108,7 +108,7 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
     — see BookCarousel.
     */
   return (
-    <Link href={`/book/${book.slug}`} className="group flex flex-col flex-shrink-0 cursor-pointer w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-[15px] md:px-[26px] xl:px-[30px] pt-[20px] xl:pt-[30px] pb-[20px] xl:pb-[61px] transition-transform duration-300 ease-out hover:-translate-y-1">
+    <Link href={`/book/${book.slug}`} className="group flex flex-col flex-shrink-0 cursor-pointer w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-[15px] md:px-[26px] xl:px-[30px] pt-[20px] xl:pt-[30px] pb-[20px] xl:pb-[61px] relative top-0 hover:-top-1 transition-[top] duration-300 ease-out">
       {/* Live keeps an empty 21px "product-top" row above the cover with 10px
           beneath it. It is empty on all 60 of its homepage tiles — no badges
           anywhere — so it is pure spacing, and reproduced as such. This card's
@@ -125,7 +125,7 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
             height={172}
             sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 20vw"
             priority={priority}
-            className="book-cover-img w-full aspect-square object-contain block transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+            className="book-cover-img w-full aspect-square object-contain block"
           />
         ) : (
           <div className="book-cover-img w-full aspect-square bg-paper-mid flex items-center justify-center p-3">
