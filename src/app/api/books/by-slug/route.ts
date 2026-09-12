@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { BOOK_SUMMARY_SELECT } from "@/lib/bookSummarySelect";
+import { BOOK_SUMMARY_SELECT, toBookSummary } from "@/lib/bookSummarySelect";
 
 /**
  * GET /api/books/by-slug?slugs=a,b,c
@@ -27,7 +27,9 @@ export async function GET(req: NextRequest) {
   });
 
   // Preserve the caller's ordering (most recently viewed first).
-  const bySlug = new Map(rows.map((b) => [b.slug, b]));
+  // Mapped to the card shape — raw rows nest the authors relation, which the
+  // card's byline can't read, so its author links were missing here.
+  const bySlug = new Map(rows.map((b) => [b.slug, toBookSummary(b)]));
   const books = slugs.map((s) => bySlug.get(s)).filter(Boolean);
 
   return NextResponse.json({ books });
