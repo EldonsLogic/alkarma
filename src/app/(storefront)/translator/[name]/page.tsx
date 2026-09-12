@@ -13,15 +13,12 @@ interface Props {
   searchParams: { page?: string; sort?: string };
 }
 
-const STRINGS = { label: "المترجم", books: (n: number) => `${n} كتاب متاح` } as const;
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const name = decodeSlug(params.name);
   return { title: name, description: `Browse all books translated by ${name}.`, ...canonical(`/translator/${encodeURIComponent(name)}`) };
 }
 
 export default async function TranslatorPage({ params, searchParams }: Props) {
-  const t = STRINGS;
   const name = decodeSlug(params.name);
 
   const page = Math.max(1, parseInt(searchParams.page ?? "1"));
@@ -50,9 +47,7 @@ export default async function TranslatorPage({ params, searchParams }: Props) {
     <div>
       <div className="bg-ink text-paper">
         <div className="max-w-[900px] mx-auto px-4 sm:px-10 py-10">
-          <p className="text-[12px] text-brand font-bold uppercase tracking-widest mb-1">{t.label}</p>
-          <h1 className="text-[28px] sm:text-[34px] font-bold mb-2">{name}</h1>
-          <p className="text-[12px] text-ink-muted mt-3">{t.books(total)}</p>
+          <h1 className="text-[28px] sm:text-[34px] font-bold">{name}</h1>
         </div>
       </div>
 
