@@ -1,12 +1,19 @@
 import type { Prisma } from "@prisma/client";
+import { BRAND_AR } from "@/lib/brand";
 
 /**
  * What counts as a "new release".
  *
- * A book qualifies if EITHER it was published in the current calendar year OR
- * someone flagged it by hand (isNewRelease). The flag alone is not enough: it
- * has to be set manually, so a title published this year would silently never
- * appear as new until somebody remembered to tick it.
+ * Only the house's own titles count: أحدث الإصدارات is دار الكرمة's new list,
+ * not the distributed catalogue's. Before this was scoped, six books from
+ * دار الخيال and شركة المطبوعات sat in it beside the 22 Karma titles. The
+ * publisher is matched on the exact string the books carry, which is the
+ * brand name.
+ *
+ * Within that, a book qualifies if EITHER it was published in the current
+ * calendar year OR someone flagged it by hand (isNewRelease). The flag alone
+ * is not enough: it has to be set manually, so a title published this year
+ * would silently never appear as new until somebody remembered to tick it.
  *
  * The year is derived from the clock every time this runs — never hardcoded —
  * so the shelf rolls over on 1 January with no code change and no admin action.
@@ -30,6 +37,7 @@ export function newReleaseWindow(now: Date = new Date()) {
 export function newReleaseWhere(now: Date = new Date()): Prisma.BookWhereInput {
   const { from, until } = newReleaseWindow(now);
   return {
+    publisher: BRAND_AR,
     OR: [{ publishDate: { gte: from, lt: until } }, { isNewRelease: true }],
   };
 }
@@ -48,9 +56,10 @@ export const NEW_RELEASE_ORDER_BY: Prisma.BookOrderByWithRelationInput[] = [
 
 /** True when a single book qualifies — for per-book UI (badges, PDP). */
 export function isNewRelease(
-  book: { publishDate?: Date | null; isNewRelease?: boolean },
+  book: { publishDate?: Date | null; isNewRelease?: boolean; publisher?: string | null },
   now: Date = new Date(),
 ): boolean {
+  if (book.publisher !== undefined && book.publisher !== BRAND_AR) return false;
   if (book.isNewRelease) return true;
   if (!book.publishDate) return false;
   const { from, until } = newReleaseWindow(now);
