@@ -36,7 +36,7 @@ const STRINGS = {
     enterGift: "أدخل كود بطاقة الهدايا",
     secure: "دفع آمن",
     returns: "إرجاع سهل خلال ١٤ يومًا",
-    continueArrow: "تسوق المزيد →",
+    continueArrow: "تسوق المزيد ←",
   } as const;
 
 export default function CartPage() {

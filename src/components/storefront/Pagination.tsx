@@ -49,7 +49,9 @@ export function Pagination({ page, total, limit, searchParams, basePath }: Props
       {page > 1 && (
         <Link href={href(page - 1)} rel="prev" aria-label="الصفحة السابقة"
           className={`${box} border-paper-dark text-ink-muted hover:text-brand hover:border-brand`}>
-          ›
+          {/* SVGs rather than ‹ ›: those characters are bidi-mirrored and the
+              RTL context flipped both, so prev pointed left and next right. */}
+          <svg aria-hidden width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
         </Link>
       )}
 
@@ -72,7 +74,7 @@ export function Pagination({ page, total, limit, searchParams, basePath }: Props
       {page < pageCount && (
         <Link href={href(page + 1)} rel="next" aria-label="الصفحة التالية"
           className={`${box} border-paper-dark text-ink-muted hover:text-brand hover:border-brand`}>
-          ‹
+          <svg aria-hidden width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
         </Link>
       )}
     </nav>

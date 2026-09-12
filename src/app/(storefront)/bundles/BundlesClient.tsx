@@ -34,7 +34,7 @@ export function BundlesClient({ bundles }: Props) {
     subtitle: "مجموعات مختارة بعناية بأسعار مميزة. اشترِ أكثر، وفر أكثر.",
     noBundles: "لا توجد مجموعات حاليًا",
     noBundlesHint: "تابعنا — نضع دائمًا مجموعات جديدة.",
-    backHome: "العودة للرئيسية →",
+    backHome: "→ العودة للرئيسية",
     books: (n: number) => `${n} كتاب`,
     more: (n: number) => `+${n} أخرى`,
     save: (pct: number) => `وفر ${pct}%`,

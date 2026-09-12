@@ -58,7 +58,7 @@ export function BundleRow({ bundles }: Props) {
           href="/bundles"
           className="text-[12px] text-brand font-bold tracking-[0.08em] uppercase hover:underline flex-shrink-0 ms-4 mb-1"
         >
-          ← عرض الكل
+          عرض الكل ←
         </Link>
       </div>
 

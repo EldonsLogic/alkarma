@@ -45,7 +45,7 @@ export function BundleDetailClient({ bundle }: Props) {
   const t = {
     home: "الرئيسية",
     bundles: "المجموعات",
-    allBundles: "كل المجموعات →",
+    allBundles: "كل المجموعات ←",
     booksInBundle: (n: number) => `${n} كتاب في هذه المجموعة`,
     retailValue: "القيمة الأصلية:",
     outOfStock: "نفد المخزون",

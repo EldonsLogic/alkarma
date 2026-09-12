@@ -36,7 +36,7 @@ const STRINGS = {
     date: "التاريخ",
     total: "الإجمالي",
     items: "المنتجات",
-    viewDetails: "← عرض التفاصيل",
+    viewDetails: "عرض التفاصيل ←",
     tracking: "التتبع:",
     moreItems: (n: number) => `+ ${n} منتجات أخرى`,
     statusLabel: (s: string) => STATUS_AR[s] ?? s,

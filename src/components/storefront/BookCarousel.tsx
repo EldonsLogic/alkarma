@@ -69,11 +69,16 @@ export function BookCarousel({ title, overline, books, viewAllHref, variant = "s
           where the reading ends is a deliberate departure from live. */}
       {viewAllHref && (
         <div className="px-5 sm:px-7 pb-6 -mt-2 flex justify-center">
+          {/* The chevron is an SVG, not "‹": that character is bidi-mirrored,
+              so inside Arabic text the browser flips it and a "‹" in the source
+              rendered as "›" — pointing the wrong way on every rail. Forward
+              in RTL points left. */}
           <Link
             href={viewAllHref}
-            className="inline-block border border-paper-dark px-6 py-[9px] text-[13px] font-semibold text-ink hover:text-brand hover:border-brand transition-colors"
+            className="inline-flex items-center gap-1 border border-paper-dark px-6 py-[9px] text-[13px] font-semibold text-ink hover:text-brand hover:border-brand transition-colors"
           >
-            المزيد ‹
+            المزيد
+            <svg aria-hidden width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
           </Link>
         </div>
       )}

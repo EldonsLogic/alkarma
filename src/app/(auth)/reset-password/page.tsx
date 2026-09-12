@@ -132,7 +132,7 @@ export default function ResetPasswordPage() {
           <ResetForm />
         </Suspense>
         <p className="text-center text-[13px] text-[#666] mt-6">
-          <Link href="/login" className="text-brand font-bold hover:underline">← Back to Sign In</Link>
+          <Link href="/login" className="text-brand font-bold hover:underline">→ العودة لتسجيل الدخول</Link>
         </p>
       </div>
     </div>
