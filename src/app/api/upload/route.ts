@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { saveUpload } from "@/lib/upload";
 import { prisma } from "@/lib/prisma";
+import { attachCoverByFilename } from "@/lib/coverMatch";
 
 export async function POST(req: NextRequest) {
   const session = await requireAdmin();
@@ -32,7 +33,15 @@ export async function POST(req: NextRequest) {
       });
     } catch { /* non-fatal */ }
 
-    return NextResponse.json({ url });
+    // Attach to the book straight away when the filename names one (ISBN,
+    // slug or title). This used to wait for the Media Library's bulk button —
+    // and that button never replaces an existing cover, so swapping a cover
+    // meant delete → upload → button and still didn't take. Best-effort: a
+    // file that names no book is simply a library file.
+    let book: { id: string; title: string; replaced: boolean } | null = null;
+    try { book = await attachCoverByFilename(file.name, url); } catch { /* non-fatal */ }
+
+    return NextResponse.json({ url, book });
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 400 });
   }

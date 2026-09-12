@@ -26,7 +26,7 @@ export function MediaLibraryClient() {
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<{ name: string; done: boolean; error?: string }[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{ name: string; done: boolean; error?: string; book?: { title: string; replaced: boolean } | null }[]>([]);
   const [copied, setCopied] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -67,8 +67,10 @@ export function MediaLibraryClient() {
         const res = await fetch("/api/upload", { method: "POST", body: fd });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? "Upload failed");
+        // The server attaches the file to its book on the spot when the
+        // filename names one; show which, so a mis-named file is obvious.
         setUploadProgress((prev) =>
-          prev.map((p, idx) => idx === i ? { ...p, done: true } : p)
+          prev.map((p, idx) => idx === i ? { ...p, done: true, book: data.book ?? null } : p)
         );
       } catch (err) {
         setUploadProgress((prev) =>
@@ -83,7 +85,7 @@ export function MediaLibraryClient() {
     // Keep failures on screen so the reason (e.g. file too large) is readable;
     // only auto-clear when everything succeeded.
     setUploadProgress((prev) => {
-      if (prev.every((p) => !p.error)) setTimeout(() => setUploadProgress([]), 3000);
+      if (prev.every((p) => !p.error)) setTimeout(() => setUploadProgress([]), prev.some((p) => p.book) ? 8000 : 3000);
       return prev;
     });
   }
@@ -227,6 +229,11 @@ export function MediaLibraryClient() {
               </span>
               <span className="truncate text-[#64748b]">{p.name}</span>
               {p.error && <span className="text-red-500 text-[11px]">{p.error}</span>}
+              {p.done && !p.error && (
+                p.book
+                  ? <span className="text-[11px] text-green-700">→ {p.book.replaced ? "replaced cover of" : "set as cover of"} <b>{p.book.title}</b></span>
+                  : <span className="text-[11px] text-[#94a3b8]">no matching book — kept in library (name a file by ISBN, slug or title to attach it)</span>
+              )}
             </div>
           ))}
         </div>

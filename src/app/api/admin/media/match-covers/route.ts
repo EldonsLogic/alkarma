@@ -5,16 +5,15 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { toSlug } from "@/lib/slug";
-
-/** Same normalisation the importer uses for filename matching. */
-const norm = (s: string) => String(s).toLowerCase().replace(/[-\s.]/g, "");
+import { normForMatch as norm } from "@/lib/coverMatch";
 
 /**
  * POST /api/admin/media/match-covers
  *
- * Assigns covers from the Media Library to products that are still on the
- * placeholder. Useful when images were uploaded AFTER the products were
- * imported, so the import-time auto-match had nothing to match against.
+ * Assigns covers from the Media Library to products that have none. Uploads
+ * and renames attach themselves as they happen (see lib/coverMatch), so this
+ * is the catch-all for files that arrived before their books did — e.g. a
+ * product import after the covers were already in the library.
  *
  * Matches by ISBN, then by title (both normalised) — the same priority the
  * importer uses. Only ever fills in a missing cover; never overwrites one.
