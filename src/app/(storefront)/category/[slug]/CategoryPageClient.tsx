@@ -13,6 +13,7 @@ import type { BookSummary, CategorySummary } from "@/types";
 import { Pagination } from "@/components/storefront/Pagination";
 import { RecentlyViewed } from "@/components/storefront/RecentlyViewed";
 import { coverSrc } from "@/lib/coverSrc";
+import { Byline } from "@/components/storefront/Byline";
 
 interface CategoryData extends CategorySummary {
   children: CategorySummary[];
@@ -478,10 +479,15 @@ function ProductCard({ book }: { book: BookSummary; }) {
     setWishlistLoading(false);
   }
 
+  const href = `/book/${book.slug}`;
+
+  // A <div>, not one big <Link>: the byline links every contributor, and an
+  // <a> inside an <a> is invalid HTML that broke hydration on every listing.
+  // Cover and title each link to the book instead. Same shape as BookCard.
   return (
-    <Link href={`/book/${book.slug}`} className="group flex flex-col cursor-pointer">
+    <div className="group flex flex-col">
       <div className="relative flex-shrink-0">
-        <div className="w-full aspect-[2/3] transition-all duration-150 overflow-hidden">
+        <Link href={href} aria-label={book.title} className="block w-full aspect-[2/3] transition-all duration-150 overflow-hidden">
           {book.coverUrl && !false ? (
             // object-contain on a TRANSPARENT frame: a third of the catalogue's
             // covers are square rather than 2:3, so contain is what shows them
@@ -494,7 +500,7 @@ function ProductCard({ book }: { book: BookSummary; }) {
               <span className="text-[10px] sm:text-[11px] text-ink-muted text-center leading-snug">{book.title}</span>
             </div>
           )}
-        </div>
+        </Link>
         {/* Badges — stacked so Bestseller + New don't overlap when both apply */}
         <div className="absolute top-2 start-2 flex flex-col gap-1 z-10">
           {book.isBestseller && (
@@ -529,20 +535,12 @@ function ProductCard({ book }: { book: BookSummary; }) {
         </button>
       </div>
       <div className="pt-3 flex flex-col flex-1">
-        <p dir="auto" className="font-display text-[14px] sm:text-[15px] font-semibold text-ink line-clamp-2 leading-snug mb-1 h-[44px] overflow-hidden">{book.title}</p>
-        {/* Byline is PLAIN TEXT: this whole card is already a <Link> (an <a>),
-            and an <a> inside an <a> is invalid HTML. The browser unnests it
-            when parsing the server HTML, so React's tree stopped matching the
-            DOM and every listing page threw a hydration error and re-rendered
-            client-side. Same fix as BookCard. */}
-        <p dir="auto" className="text-[12px] text-ink-muted mb-2 line-clamp-1">
-          {(book.authors && book.authors.length > 0
-            ? Array.from(new Set(book.authors.map((a) => a.name)))
-            : [book.author]
-          )
-            .filter(Boolean)
-            .join("، ")}
-        </p>
+        <Link href={href} className="block">
+          <p dir="auto" className="font-display text-[14px] sm:text-[15px] font-semibold text-ink line-clamp-2 leading-snug mb-1 h-[44px] overflow-hidden group-hover:text-brand transition-colors">{book.title}</p>
+        </Link>
+        <div className="mb-2">
+          <Byline book={book} lineClassName="text-[12px] text-ink-muted line-clamp-1" />
+        </div>
         <PriceDisplay item={book} size="sm" />
         {/* Buy Now + Add to Cart, matching the deployed Jee listing exactly:
           the reveal is per-BUTTON, not on the wrapper.
@@ -569,6 +567,6 @@ function ProductCard({ book }: { book: BookSummary; }) {
           </button>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

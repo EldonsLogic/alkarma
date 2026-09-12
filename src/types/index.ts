@@ -20,6 +20,9 @@ export interface BookSummary {
   author: string;
   authorSlug?: string | null;
   authors?: { name: string; nameAr?: string | null; slug: string }[];
+  /** Display strings; several names are joined with "، ". Linked per name on cards. */
+  translator?: string | null;
+  editor?: string | null;
   coverUrl: string;
   priceEgp: number;
   compareAtEgp?: number | null;

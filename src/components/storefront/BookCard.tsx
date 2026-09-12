@@ -11,15 +11,13 @@ import { useCartStore } from "@/stores/cart.store";
 import { effectivePrices, savingsPercent } from "@/lib/currency";
 import type { BookSummary } from "@/types";
 import { coverSrc } from "@/lib/coverSrc";
+import { Byline } from "./Byline";
 
 interface Props {
   book: BookSummary;
   showAddToCart?: boolean;
   priority?: boolean;
 }
-
-/** Live prefixes the byline on its product tiles, e.g. "تأليف: ميرنا المهدي". */
-const BYLINE = "تأليف: ";
 
 export function BookCard({ book, showAddToCart = true, priority = false }: Props) {
 
@@ -80,15 +78,7 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
   }
 
   const displayTitle = book.title;
-  // De-duplicated so a book credited to the same person twice does not render
-  // "تأليف: فلان، فلان".
-  const byline = (
-    book.authors && book.authors.length > 0
-      ? Array.from(new Set(book.authors.map((a) => a.name)))
-      : [book.author]
-  )
-    .filter(Boolean)
-    .join("، ");
+  const href = `/book/${book.slug}`;
   const discount = savingsPercent(book);
 
   /*
@@ -108,8 +98,16 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
     therefore carry gap-0, and its content box must be min(vw - 30, 1170)
     — see BookCarousel.
     */
+  /*
+    The card is a <div>, not one big <Link>. It used to be a single anchor
+    around everything, which is why the byline had to be plain text: an <a>
+    inside an <a> is invalid HTML, the parser un-nests it, and React then
+    failed to hydrate every page with a card on it. Now the cover and the title
+    are each a link to the book, and every contributor in the byline is a link
+    of its own.
+    */
   return (
-    <Link href={`/book/${book.slug}`} className="group flex flex-col flex-shrink-0 cursor-pointer w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-[15px] md:px-[26px] xl:px-[30px] pt-[20px] xl:pt-[30px] pb-[20px] xl:pb-[61px] relative top-0 hover:-top-1 transition-[top] duration-300 ease-out">
+    <div className="group flex flex-col flex-shrink-0 w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-[15px] md:px-[26px] xl:px-[30px] pt-[20px] xl:pt-[30px] pb-[20px] xl:pb-[61px] relative top-0 hover:-top-1 transition-[top] duration-300 ease-out">
       {/* Live keeps an empty 21px "product-top" row above the cover with 10px
           beneath it. It is empty on all 60 of its homepage tiles — no badges
           anywhere — so it is pure spacing, and reproduced as such. This card's
@@ -118,6 +116,7 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
 
       {/* Cover */}
       <div className="relative flex-shrink-0">
+        <Link href={href} aria-label={displayTitle} className="block">
         {book.coverUrl ? (
           <Image
             src={coverSrc(book.coverUrl)}
@@ -133,6 +132,7 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
             <span className="text-[11px] text-ink-muted text-center leading-snug">{displayTitle}</span>
           </div>
         )}
+        </Link>
 
         {/* Badges — RTL-safe: start-2.
             The discount pill comes first: on a reduced title it is the single
@@ -189,23 +189,17 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
       <div className="pt-[17px] xl:pt-[25px] flex flex-col">
         {/* Live's grid title is 16.8px bold, not 14px regular — measured on its
             own product tiles at 1280. Two lines, then the byline. */}
-        <p dir="auto" className="font-display text-[16.8px] font-bold text-ink leading-[20px] line-clamp-2 overflow-hidden">
-          {displayTitle}
-        </p>
-        {/* Byline — PLAIN TEXT, deliberately not links.
-            The whole card is already an <a> (the Link wrapping it), and HTML
-            forbids nesting an <a> inside an <a>. The browser's parser silently
-            unnests them when it parses the server HTML, so React's client tree
-            no longer matched the DOM and every page rendering a BookCard threw
-            "Expected server HTML to contain a matching <div> in <a>" and fell
-            back to a full client re-render. Rendering the byline as text fixes
-            that, and matches live, which also keeps the byline inside the
-            product link rather than linking the author separately. Authors are
-            still reachable from the product page. */}
-        <p dir="auto" className="text-[14px] text-ink leading-[20px] h-[20px] mb-[5px] xl:mb-0 line-clamp-1">
-          {BYLINE}
-          {byline}
-        </p>
+        <Link href={href} className="block">
+          <p dir="auto" className="font-display text-[16.8px] font-bold text-ink leading-[20px] line-clamp-2 overflow-hidden group-hover:text-brand transition-colors">
+            {displayTitle}
+          </p>
+        </Link>
+        {/* One 20px line per contributor role, each name linked. A translated
+            book is one line taller than live's tile; rows still align because
+            the buttons sit at mt-auto. */}
+        <div className="mb-[5px] xl:mb-0">
+          <Byline book={book} lineClassName="text-[14px] text-ink leading-[20px] h-[20px] line-clamp-1" />
+        </div>
 
         {book.averageRating !== undefined && book.reviewCount !== undefined && (
           <StarRating rating={book.averageRating} count={book.reviewCount} />
@@ -243,6 +237,6 @@ export function BookCard({ book, showAddToCart = true, priority = false }: Props
         </div>
       )}
 
-    </Link>
+    </div>
   );
 }

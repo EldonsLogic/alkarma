@@ -31,7 +31,9 @@ export default async function TranslatorPage({ params, searchParams }: Props) {
   const sort = searchParams.sort ?? "bestselling";
   const orderBy = resolveSortOrderBy(sort);
 
-  const where = { isActive: true, translator: name };
+  // Substring match: the field is a display string that may hold several
+  // names joined with "، ", and the card byline links each of them separately.
+  const where = { isActive: true, translator: { contains: name } };
 
   const [books, total, allCategories] = await Promise.all([
     prisma.book.findMany({
@@ -68,6 +70,7 @@ export default async function TranslatorPage({ params, searchParams }: Props) {
         books={books.map((b) => ({
           id: b.id, slug: b.slug, title: b.title, titleAr: b.titleAr ?? null, author: b.author,
           authorSlug: b.authorRef?.slug ?? null,
+          translator: b.translator ?? null, editor: b.editor ?? null,
           authors: b.authors.map((ba) => ({ name: ba.author.name, nameAr: ba.author.nameAr, slug: ba.author.slug })),
           coverUrl: b.coverUrl,
           priceEgp: Number(b.priceEgp), compareAtEgp: b.compareAtEgp ? Number(b.compareAtEgp) : null,
@@ -75,7 +78,7 @@ export default async function TranslatorPage({ params, searchParams }: Props) {
           salesCount: b.salesCount, stock: b.stock,
         }))}
         allCategories={allCategories}
-      total={total}
+        total={total}
         page={page}
         limit={limit}
         searchParams={searchParams}

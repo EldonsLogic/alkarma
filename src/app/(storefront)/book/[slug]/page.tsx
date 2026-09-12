@@ -247,6 +247,7 @@ export default async function BookPage({ params }: Props) {
       similar={similar.map((b) => ({
         id: b.id, slug: b.slug, title: b.title, author: b.author,
         authorSlug: b.authorRef?.slug ?? null,
+        translator: b.translator ?? null, editor: b.editor ?? null,
         authors: b.authors.map((ba) => ({ name: ba.author.name, nameAr: ba.author.nameAr, slug: ba.author.slug })),
         coverUrl: b.coverUrl,
         priceEgp: Number(b.priceEgp),
@@ -261,6 +262,7 @@ export default async function BookPage({ params }: Props) {
         titleAr: b.titleAr ?? null,
         author: b.author,
         authorSlug: b.authorRef?.slug ?? null,
+        translator: b.translator ?? null, editor: b.editor ?? null,
         authors: b.authors.map((ba) => ({ name: ba.author.name, nameAr: ba.author.nameAr, slug: ba.author.slug })),
         coverUrl: b.coverUrl,
         priceEgp: Number(b.priceEgp),
@@ -278,6 +280,7 @@ export default async function BookPage({ params }: Props) {
         titleAr: b.titleAr ?? null,
         author: b.author,
         authorSlug: b.authorRef?.slug ?? null,
+        translator: b.translator ?? null, editor: b.editor ?? null,
         authors: b.authors.map((ba) => ({ name: ba.author.name, nameAr: ba.author.nameAr, slug: ba.author.slug })),
         coverUrl: b.coverUrl,
         priceEgp: Number(b.priceEgp),

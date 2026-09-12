@@ -292,20 +292,24 @@ export function PDPClient({ book, related, similar, moreByAuthor, externalReview
               <span className="text-brand font-semibold">{book.author}</span>
             )}
           </p>
-          {book.translator && (
-            <p className="text-[13px] text-ink-muted mb-1">
-              {"ترجمة: "}
-              <Link href={`/translator/${encodeURIComponent(book.translator)}`} className="text-ink-soft hover:text-brand hover:underline">
-                {book.translator}
-              </Link>
-            </p>
-          )}
-          {book.editor && (
-            <p className="text-[13px] text-ink-muted mb-3">
-              {"تحرير: "}
-              <span className="text-ink-soft">{book.editor}</span>
-            </p>
-          )}
+          {/* Translator and editor are display strings that may hold several
+              names joined with "، " — each name is its own link, like the
+              card bylines. */}
+          {([["ترجمة: ", book.translator, "/translator", "mb-1"], ["تحرير: ", book.editor, "/editor", "mb-3"]] as const)
+            .filter(([, value]) => !!value)
+            .map(([label, value, base, mb]) => (
+              <p key={base} className={`text-[13px] text-ink-muted ${mb}`}>
+                {label}
+                {(value as string).split(/[،,]/).map((n) => n.trim()).filter(Boolean).map((n, i) => (
+                  <span key={n}>
+                    {i > 0 && "، "}
+                    <Link href={`${base}/${encodeURIComponent(n)}`} className="text-ink-soft hover:text-brand hover:underline">
+                      {n}
+                    </Link>
+                  </span>
+                ))}
+              </p>
+            ))}
 
           {/* Tags — clickable, searchable labels (publisher is included by default) */}
           {book.tags && book.tags.length > 0 && (

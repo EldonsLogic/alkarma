@@ -109,6 +109,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         titleAr: b.titleAr ?? null,
         author: b.author,
         authorSlug: b.authorRef?.slug ?? null,
+        translator: b.translator ?? null, editor: b.editor ?? null,
         authors: b.authors.map((ba) => ({ name: ba.author.name, nameAr: ba.author.nameAr, slug: ba.author.slug })),
         coverUrl: b.coverUrl,
         priceEgp: Number(b.priceEgp),

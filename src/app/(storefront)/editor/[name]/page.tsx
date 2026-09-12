@@ -13,14 +13,14 @@ interface Props {
   searchParams: { page?: string; sort?: string };
 }
 
-const STRINGS = { label: "الناشر", books: (n: number) => `${n} كتاب متاح` } as const;
+const STRINGS = { label: "المحرر", books: (n: number) => `${n} كتاب متاح` } as const;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const name = decodeSlug(params.name);
-  return { title: name, description: `Browse all books published by ${name}.`, ...canonical(`/publisher/${encodeURIComponent(name)}`) };
+  return { title: name, description: `Browse all books edited by ${name}.`, ...canonical(`/editor/${encodeURIComponent(name)}`) };
 }
 
-export default async function PublisherPage({ params, searchParams }: Props) {
+export default async function EditorPage({ params, searchParams }: Props) {
   const t = STRINGS;
   const name = decodeSlug(params.name);
 
@@ -31,19 +31,9 @@ export default async function PublisherPage({ params, searchParams }: Props) {
   const sort = searchParams.sort ?? "bestselling";
   const orderBy = resolveSortOrderBy(sort);
 
-  // Books carry the publisher as free text, and for two imprints the store's
-  // own category name is longer than that text ("دار جامعة حمد بن خليفة للنشر"
-  // vs "جامعة حمد بن خليفة"), so the mega-menu's imprint links 404ed on an
-  // exact match. The PUBLISHER category is the authority when one exists;
-  // the raw string is the fallback for publishers that have no category row.
-  const publisherCategory = await prisma.category.findFirst({
-    where: { kind: "PUBLISHER", name },
-    select: { id: true },
-  });
-
-  const where = publisherCategory
-    ? { isActive: true, categories: { some: { categoryId: publisherCategory.id } } }
-    : { isActive: true, publisher: name };
+  // Substring match: the field is a display string that may hold several
+  // names joined with "، ", and the card byline links each of them separately.
+  const where = { isActive: true, editor: { contains: name } };
 
   const [books, total, allCategories] = await Promise.all([
     prisma.book.findMany({
@@ -68,10 +58,10 @@ export default async function PublisherPage({ params, searchParams }: Props) {
 
       <CategoryPageClient
         category={{
-          id: `publisher-${name}`,
+          id: `editor-${name}`,
           slug: name,
-          name: `Books by ${name}`,
-          nameAr: `كتب ${name}`,
+          name: `Books edited by ${name}`,
+          nameAr: `تحرير ${name}`,
           imageUrl: null,
           sortOrder: 0,
           children: [],
@@ -88,7 +78,7 @@ export default async function PublisherPage({ params, searchParams }: Props) {
           salesCount: b.salesCount, stock: b.stock,
         }))}
         allCategories={allCategories}
-      total={total}
+        total={total}
         page={page}
         limit={limit}
         searchParams={searchParams}
