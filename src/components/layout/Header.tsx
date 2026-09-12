@@ -133,7 +133,14 @@ export function Header({ navCategories }: Props) {
         {/* Live's masthead sits on #F4F4F4, a shade off the white nav bar
             below it — measured on the live header. bg-paper (white) made the
             two bars read as one slab. */}
-        <nav className="relative bg-[#F4F4F4] border-b border-paper-dark px-4 md:px-10 flex items-center gap-3 md:gap-6 h-[60px] md:h-[72px] sticky top-0 z-[101] shadow-[0_1px_4px_rgba(26,18,8,0.07)]">
+        {/* Both header rows share the hero's 1170px column: on live the logo
+            and الرئيسية sit 15px inside its right edge and the cart is flush
+            with its left edge (measured at 1440: hero 135–1305, logo → 1290,
+            nav text → 1290, cart → 135). Padding the full-width bar instead
+            put the logo 40px from the viewport edge and let it drift away
+            from the hero as the screen widened. */}
+        <nav className="relative bg-[#F4F4F4] border-b border-paper-dark h-[60px] md:h-[72px] sticky top-0 z-[101] shadow-[0_1px_4px_rgba(26,18,8,0.07)]">
+        <div className="relative h-full w-[calc(100%-30px)] max-w-[1170px] mx-auto lg:ps-[15px] flex items-center gap-3 md:gap-6">
 
           {/* Hamburger */}
           <button
@@ -230,6 +237,7 @@ export function Header({ navCategories }: Props) {
               <CartIcon />
             </span>
           </div>
+        </div>
         </nav>
 
         {/* Mobile Search Bar */}
@@ -252,14 +260,15 @@ export function Header({ navCategories }: Props) {
         )}
 
         {/* ── Department nav bar (desktop) ── */}
-        <div className="hidden lg:flex items-center bg-paper border-b border-paper-dark sticky top-[72px] z-[101] px-4 lg:px-10 gap-0">
+        <div className="hidden lg:block bg-paper border-b border-paper-dark sticky top-[72px] z-[101]">
+        <div className="flex items-center w-[calc(100%-30px)] max-w-[1170px] mx-auto gap-0">
 
           {NAV_BEFORE_CATEGORIES.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               // Live paints the current page's nav item brand red.
-              className={`px-5 py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 border-transparent transition-all hover:text-brand hover:border-brand ${
+              className={`px-[15px] py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 border-transparent transition-all hover:text-brand hover:border-brand ${
                 pathname === link.href ? "text-brand" : "text-ink"
               }`}
             >
@@ -274,7 +283,7 @@ export function Header({ navCategories }: Props) {
               onMouseLeave={scheduleClose}
             >
               {(() => {
-                const cls = `flex items-center gap-1 px-5 py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 transition-all ${
+                const cls = `flex items-center gap-1 px-[15px] py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 transition-all ${
                   hoveredMenu === mother.key
                     ? "text-brand border-brand"
                     : "text-ink border-transparent hover:text-brand hover:border-brand"
@@ -307,7 +316,7 @@ export function Header({ navCategories }: Props) {
               key={link.href}
               href={link.href}
               // Live paints the current page's nav item brand red.
-              className={`px-5 py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 border-transparent transition-all hover:text-brand hover:border-brand ${
+              className={`px-[15px] py-[13px] text-[14px] font-normal whitespace-nowrap border-b-2 border-transparent transition-all hover:text-brand hover:border-brand ${
                 pathname === link.href ? "text-brand" : "text-ink"
               }`}
             >
@@ -321,6 +330,7 @@ export function Header({ navCategories }: Props) {
             </Link>
           )}
         </div>
+        </div>
 
         {/* ── Mega-menu panel ─────────────────────────────────────
             Measured directly off the live panel. It is fetched over AJAX into
@@ -329,7 +339,11 @@ export function Header({ navCategories }: Props) {
             loads it; once loaded its real geometry can be read exactly.
 
               panel    864px wide, white, border-top 1px #D0D0D0,
-                       radius 0 0 3px 3px, no shadow, z-index 1000
+                       radius 0 0 3px 3px, no shadow, z-index 1000; its
+                       start edge sits on the 1170px column's start edge
+                       (live: panel right 1305 = hero right 1305), which is
+                       what the max(15px, 50% - 585px) offset reproduces
+                       without the panel having to live inside that column
               columns  5 equal 172.8px columns, 30px vertical padding.
                        Columns 2 and 4 (0-indexed 1 and 3) are striped
                        #F3F3F3; the rest are white.
@@ -354,7 +368,7 @@ export function Header({ navCategories }: Props) {
             values with no counterpart in this store's palette. */}
         {activeMother && activeMother.groups.length > 0 && (
           <div
-            className="hidden lg:block absolute start-4 lg:start-10 w-[864px] max-w-[calc(100%-2rem)] lg:max-w-[calc(100%-5rem)] bg-white border-t border-[#D0D0D0] rounded-b-[3px] z-[102] overflow-hidden"
+            className="hidden lg:block absolute start-[max(15px,calc(50%-585px))] w-[864px] max-w-[calc(100%-30px)] bg-white border-t border-[#D0D0D0] rounded-b-[3px] z-[102] overflow-hidden"
             onMouseEnter={() => openMenu(activeMother.key)}
             onMouseLeave={scheduleClose}
           >
