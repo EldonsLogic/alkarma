@@ -54,17 +54,15 @@ export default async function AuthorPage({ params, searchParams }: Props) {
 
   return (
     <div>
-      {/* Author header — name only (no avatar) */}
+      {/* Author header — the name (and bio when there is one), nothing else:
+          no "مؤلف" label above it and no book count beneath, both removed on
+          request. The count is already in the listing's "عرض ١–٩ من أصل ٩". */}
       <div className="bg-ink text-paper">
         <div className="max-w-[900px] mx-auto px-4 sm:px-10 py-10">
-          <p className="text-[12px] text-brand font-bold uppercase tracking-widest mb-1">مؤلف</p>
-          <h1 className="text-[28px] sm:text-[34px] font-bold mb-2">{displayName}</h1>
+          <h1 className="text-[28px] sm:text-[34px] font-bold">{displayName}</h1>
           {displayBio && (
-            <p className="text-[14px] text-ink-muted leading-relaxed max-w-[600px]">{displayBio}</p>
+            <p className="text-[14px] text-ink-muted leading-relaxed max-w-[600px] mt-2">{displayBio}</p>
           )}
-          <p className="text-[12px] text-ink-muted mt-3">
-            {`${total} كتاب متاح`}
-          </p>
         </div>
       </div>
 
