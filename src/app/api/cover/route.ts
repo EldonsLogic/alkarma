@@ -27,9 +27,9 @@ export const runtime = "nodejs";
  * Deliberately a read-through proxy rather than a batch re-upload: the Blob
  * store is shared with the other project, so rewriting those files would change
  * its covers too, and re-uploading under new keys needs a write token this
- * environment does not have. Responses are immutable and long-cached, and Next
- * caches the optimised variants on top, so the sharp work happens once per
- * image.
+ * environment did not have at the time. Responses are CDN-cached (briefly, since
+ * covers are now replaced in place at a fixed key) and Next caches the
+ * optimised variants on top, so the sharp work is rare.
  */
 
 const ALLOWED_HOST_SUFFIX = ".public.blob.vercel-storage.com";
@@ -65,7 +65,11 @@ export async function GET(req: NextRequest) {
     return new NextResponse(new Uint8Array(out), {
       headers: {
         "Content-Type": "image/webp",
-        "Cache-Control": "public, max-age=31536000, immutable",
+        // Not immutable any more: a cover lives at a fixed key and is replaced
+        // in place (lib/coverKey), so the same src can change. The CDN keeps
+        // a copy for 10 minutes and serves it stale while re-trimming in the
+        // background, so a swap shows within minutes and no visitor waits.
+        "Cache-Control": "public, max-age=0, s-maxage=600, stale-while-revalidate=86400",
       },
     });
   } catch {

@@ -11,6 +11,8 @@ interface Props {
   dimensionsNote?: string; // extra context e.g. "(2 : 3 ratio — portrait)"
   onUrlChange?: (url: string) => void; // notify parent when URL changes
   maxSizeMB?: number; // upload limit in megabytes (default 1 MB)
+  /** When set, the upload is stored as this book's cover at its fixed key. */
+  bookId?: string;
 }
 
 const DEFAULT_MAX_MB = 1;
@@ -24,6 +26,7 @@ export function ImageUpload({
   dimensionsNote,
   onUrlChange,
   maxSizeMB = DEFAULT_MAX_MB,
+  bookId,
 }: Props) {
   const [url, setUrl] = useState(defaultValue);
 
@@ -56,6 +59,7 @@ export function ImageUpload({
     try {
       const fd = new FormData();
       fd.append("file", file);
+      if (bookId) fd.append("bookId", bookId);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
 
       // Read the body defensively — an error response may be plain text/HTML

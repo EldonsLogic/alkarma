@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { COVER_CACHE_SECONDS } from "@/lib/coverKey";
 
 // Largest file a user may SELECT. We compress server-side, so this only needs
 // to be generous enough for publisher-supplied covers (usually 1–4 MB).
@@ -52,13 +53,21 @@ export async function optimise(
 /**
  * Persist a buffer as a public image and return its URL.
  * Used internally by saveUpload and saveUploadBuffer.
+ *
+ * With a `pathname` the file is written to exactly that key and overwrites
+ * whatever is there — this is how a book's cover stays at covers/<isbn>.webp
+ * across replacements (see lib/coverKey). Without one it gets a random name
+ * under uploads/, as before.
  */
-async function persist(buffer: Buffer, filename: string): Promise<string> {
+async function persist(buffer: Buffer, filename: string, pathname?: string): Promise<string> {
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     const { put } = await import("@vercel/blob");
-    const { url } = await put(`uploads/${filename}`, buffer, {
+    const { url } = await put(pathname ?? `uploads/${filename}`, buffer, {
       access: "public",
       contentType: "image/webp",
+      ...(pathname
+        ? { addRandomSuffix: false, allowOverwrite: true, cacheControlMaxAge: COVER_CACHE_SECONDS }
+        : {}),
     });
     return url;
   }
@@ -76,15 +85,16 @@ async function persist(buffer: Buffer, filename: string): Promise<string> {
   const { default: path } = await import("path");
   const dir = path.resolve(process.env.UPLOAD_DIR ?? "./public/uploads");
   await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, filename), buffer);
-  return `/uploads/${filename}`;
+  const local = pathname ? pathname.replace(/\//g, "_") : filename;
+  await writeFile(path.join(dir, local), buffer);
+  return `/uploads/${local}`;
 }
 
 /**
  * Save an uploaded File (from a form/multipart request).
  * Optimises the image before persisting.
  */
-export async function saveUpload(file: File): Promise<{ url: string; size: number }> {
+export async function saveUpload(file: File, opts: { pathname?: string } = {}): Promise<{ url: string; size: number }> {
   if (!file.type.startsWith("image/")) {
     throw new Error("File type not allowed. Please upload an image file (JPG, PNG or WebP).");
   }
@@ -98,7 +108,7 @@ export async function saveUpload(file: File): Promise<{ url: string; size: numbe
   const raw = Buffer.from(await file.arrayBuffer());
   const optimised = await optimise(raw);
   const name = `${crypto.randomBytes(16).toString("hex")}.webp`;
-  const url = await persist(optimised, name);
+  const url = await persist(optimised, name, opts.pathname);
   return { url, size: optimised.byteLength };
 }
 

@@ -226,6 +226,7 @@ export default async function AdminProductEditPage({ params, searchParams }: { p
               <ImageUpload
                 name="coverUrl"
                 label="Book Cover"
+                bookId={book.id}
                 defaultValue={book.coverUrl}
                 shape="cover"
                 dimensions="400 × 600 px"
