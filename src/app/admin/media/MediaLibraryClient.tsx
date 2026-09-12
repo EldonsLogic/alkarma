@@ -33,9 +33,7 @@ export function MediaLibraryClient() {
   const [renaming, setRenaming] = useState(false);
   const [renameVal, setRenameVal] = useState("");
   const [syncing, setSyncing] = useState(false);
-  const [recompressing, setRecompressing] = useState(false);
   const [matching, setMatching] = useState(false);
-  const [recompressMsg, setRecompressMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
 
@@ -150,52 +148,6 @@ export function MediaLibraryClient() {
     }
   }
 
-  // Re-compress oversized images already in storage. Scans the blob store
-  // ONCE (GET), then processes the already-known list in batches (POST) with
-  // no further scanning — list() is a scarce, billed "Advanced Request" on
-  // Vercel Blob, and re-scanning per batch previously burned through most of
-  // the monthly free quota in a single run. URLs are preserved so no cover
-  // can break.
-  async function recompressAll() {
-    if (!confirm("Compress all oversized images already in storage?\n\nImage URLs stay the same, so no book cover will break.")) return;
-    setRecompressing(true);
-    try {
-      const scanRes = await fetch("/api/admin/media/recompress");
-      const scan = await scanRes.json();
-      if (!scanRes.ok) { alert(scan.error ?? "Scan failed."); return; }
-
-      const oversized: { url: string; pathname: string; size: number }[] = scan.oversized ?? [];
-      if (oversized.length === 0) { alert(`Scanned ${scan.scanned} files — none are oversized.`); return; }
-
-      const BATCH = 40;
-      let processed = 0, savedMb = 0;
-      const failed: string[] = [];
-      for (let i = 0; i < oversized.length; i += BATCH) {
-        const batch = oversized.slice(i, i + BATCH);
-        setRecompressMsg(`Compressing ${Math.min(i + BATCH, oversized.length)} of ${oversized.length}…`);
-        const res = await fetch("/api/admin/media/recompress", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ blobs: batch }),
-        });
-        const data = await res.json();
-        if (!res.ok) { alert(data.error ?? "Compression failed."); break; }
-        processed += data.processed;
-        savedMb += data.savedMb;
-        if (data.failed?.length) failed.push(...data.failed);
-      }
-
-      alert(
-        `Scanned ${scan.scanned} files · ${oversized.length} oversized · compressed ${processed} (saved ${savedMb.toFixed(1)} MB).` +
-        (failed.length ? `\n\nSkipped:\n${failed.slice(0, 10).join("\n")}` : "")
-      );
-      load(1, q);
-    } finally {
-      setRecompressing(false);
-      setRecompressMsg("");
-    }
-  }
-
   // Assign Media Library images to products still on the placeholder cover
   // (e.g. images uploaded after the products were imported).
   async function matchCovers() {
@@ -243,14 +195,6 @@ export function MediaLibraryClient() {
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-[#e2e8f0] hover:border-[#3b82f6] text-[#475569] hover:text-[#1e293b] text-[13px] font-bold rounded-sm cursor-pointer transition-colors disabled:opacity-50"
           >
             {matching ? "Matching…" : "Match Covers to Products"}
-          </button>
-          <button
-            onClick={recompressAll}
-            disabled={recompressing}
-            title="Compress oversized images already in storage (URLs are preserved)"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-[#e2e8f0] hover:border-[#3b82f6] text-[#475569] hover:text-[#1e293b] text-[13px] font-bold rounded-sm cursor-pointer transition-colors disabled:opacity-50"
-          >
-            {recompressing ? (recompressMsg ? "Compressing…" : "Starting…") : "Compress Oversized Images"}
           </button>
           <button
             onClick={syncExisting}
