@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getSidebarCategories } from "@/lib/sidebarCategories";
 import { BOOK_SUMMARY_SELECT } from "@/lib/bookSummarySelect";
 import { CategoryPageClient } from "../category/[slug]/CategoryPageClient";
 import { searchProductIds } from "@/lib/search";
@@ -52,9 +53,10 @@ export default async function SearchPage({ searchParams }: Props) {
   const sort = searchParams.sort ?? "bestselling";
   const orderBy = resolveSortOrderBy(sort);
 
-  const [books, total] = await Promise.all([
+  const [books, total, allCategories] = await Promise.all([
     prisma.book.findMany({ where, orderBy, skip, take: limit, select: BOOK_SUMMARY_SELECT }),
     prisma.book.count({ where }),
+    getSidebarCategories(),
   ]);
 
   // Record the search for admin Search Analytics (first page only; fire-and-forget)
@@ -78,7 +80,8 @@ export default async function SearchPage({ searchParams }: Props) {
           isBestseller: b.isBestseller, isNewRelease: b.isNewRelease, isFeatured: b.isFeatured,
           salesCount: b.salesCount, stock: b.stock,
         }))}
-        total={total} page={page} limit={limit}
+        allCategories={allCategories}
+      total={total} page={page} limit={limit}
         searchParams={searchParams}
       />
     </div>

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getSidebarCategories } from "@/lib/sidebarCategories";
 import { BOOK_SUMMARY_SELECT } from "@/lib/bookSummarySelect";
 import { resolveSortOrderBy } from "@/lib/sort";
 import { CategoryPageClient } from "../category/[slug]/CategoryPageClient";
@@ -39,9 +40,10 @@ export default async function BestsellersPage({ searchParams }: Props) {
     } : {}),
   };
 
-  const [books, total] = await Promise.all([
+  const [books, total, allCategories] = await Promise.all([
     prisma.book.findMany({ where, orderBy, skip, take: limit, select: BOOK_SUMMARY_SELECT }),
     prisma.book.count({ where }),
+    getSidebarCategories(),
   ]);
 
   return (
@@ -55,6 +57,7 @@ export default async function BestsellersPage({ searchParams }: Props) {
         isBestseller: b.isBestseller, isNewRelease: b.isNewRelease,
         isFeatured: b.isFeatured, salesCount: b.salesCount, stock: b.stock,
       }))}
+      allCategories={allCategories}
       total={total}
       page={page}
       limit={limit}

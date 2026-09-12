@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getSidebarCategories } from "@/lib/sidebarCategories";
 import { BOOK_SUMMARY_SELECT } from "@/lib/bookSummarySelect";
 import { decodeSlug } from "@/lib/slug";
 import { canonical } from "@/lib/seo";
@@ -39,7 +40,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
 
   const where = { isActive: true, authors: { some: { authorId: author.id } } };
 
-  const [books, total] = await Promise.all([
+  const [books, total, allCategories] = await Promise.all([
     prisma.book.findMany({
       where,
       orderBy,
@@ -48,6 +49,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
       select: BOOK_SUMMARY_SELECT,
     }),
     prisma.book.count({ where }),
+    getSidebarCategories(),
   ]);
 
   return (
@@ -95,7 +97,8 @@ export default async function AuthorPage({ params, searchParams }: Props) {
           salesCount: b.salesCount,
           stock: b.stock,
         }))}
-        total={total}
+        allCategories={allCategories}
+      total={total}
         page={page}
         limit={limit}
         searchParams={searchParams}

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getSidebarCategories } from "@/lib/sidebarCategories";
 import { BOOK_SUMMARY_SELECT } from "@/lib/bookSummarySelect";
 import { decodeSlug } from "@/lib/slug";
 import { canonical } from "@/lib/seo";
@@ -32,12 +33,13 @@ export default async function TranslatorPage({ params, searchParams }: Props) {
 
   const where = { isActive: true, translator: name };
 
-  const [books, total] = await Promise.all([
+  const [books, total, allCategories] = await Promise.all([
     prisma.book.findMany({
       where, orderBy, skip, take: limit,
       select: BOOK_SUMMARY_SELECT,
     }),
     prisma.book.count({ where }),
+    getSidebarCategories(),
   ]);
 
   if (total === 0 && page === 1) notFound();
@@ -72,7 +74,8 @@ export default async function TranslatorPage({ params, searchParams }: Props) {
           isBestseller: b.isBestseller, isNewRelease: b.isNewRelease, isFeatured: b.isFeatured,
           salesCount: b.salesCount, stock: b.stock,
         }))}
-        total={total}
+        allCategories={allCategories}
+      total={total}
         page={page}
         limit={limit}
         searchParams={searchParams}

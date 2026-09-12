@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getSidebarCategories } from "@/lib/sidebarCategories";
 import { BOOK_SUMMARY_SELECT } from "@/lib/bookSummarySelect";
 import { CategoryPageClient } from "./CategoryPageClient";
 import { decodeSlug } from "@/lib/slug";
@@ -72,19 +73,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       select: BOOK_SUMMARY_SELECT,
     }),
     prisma.book.count({ where }),
-    // Sidebar category list with in-stock counts, as the store shows it.
-    // Explicit select + a _count aggregate rather than loading book rows.
-    prisma.category.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: "asc" },
-      select: {
-        slug: true,
-        name: true,
-        _count: {
-          select: { books: { where: { book: { isActive: true, stock: { gt: 0 } } } } },
-        },
-      },
-    }),
+    getSidebarCategories(category.slug),
   ]);
 
   return (
@@ -130,19 +119,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         salesCount: b.salesCount,
         stock: b.stock,
       }))}
-      // Empty shelves are dropped from the sidebar. Three of them —
-      // أحدث الإصدارات / الأكثر مبيعًا / عروض وخصومات — are real category rows
-      // that exist only so the nav has something to point at; the actual
-      // listings live at /new-releases, /bestsellers and /deals, so linking
-      // them here sent readers to a permanently empty page. The current
-      // category is kept regardless so the sidebar can still mark it active.
-      allCategories={allCategories
-        .filter((c) => c._count.books > 0 || c.slug === category.slug)
-        .map((c) => ({
-          slug: c.slug,
-          name: c.name,
-          count: c._count.books,
-        }))}
+      allCategories={allCategories}
       total={total}
       page={page}
       limit={limit}
