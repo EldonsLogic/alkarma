@@ -27,7 +27,6 @@ const SOCIALS: Record<string, string> = {
 // Smart Slider markup on the live homepage).
 const BANNERS = [
   { title: "أحدث الإصدارات",          img: "/hero/hero-2026-1ST.jpg", href: "/new-releases",      cta: "تصفح الإصدارات" },
-  { title: "تخفيضات معرض القاهرة",   img: "/hero/hero-2026-2nd.jpg", href: "/arabic-books",      cta: "تسوق الآن" },
   { title: "أقوى كتب الجريمة",        img: "/hero/hero-2025-2ND.jpg", href: "/category/روايات",   cta: "تصفح الروايات" },
   { title: "المكتبة التراثية الصغيرة", img: "/hero/hero-2025-6TH.jpg", href: "/arabic-books",      cta: "تصفح المجموعة" },
   { title: "أحدث الإصدارات — الخريف", img: "/hero/hero-2025-1ST.jpg", href: "/new-releases",      cta: "تصفح الإصدارات" },
